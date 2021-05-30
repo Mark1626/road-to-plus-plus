@@ -7,7 +7,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug",
+      "name": "Debug Chapter 2",
       "program": "${workspaceFolder}/main",
       "args": [],
       "cwd": "${workspaceFolder}"

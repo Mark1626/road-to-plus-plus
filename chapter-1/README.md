@@ -1,4 +1,4 @@
-# Experiment 1
+# Chapter 1
 
 ## Makefile 101
 
