@@ -1,4 +1,6 @@
-# Chapter 3
+# Chapter 3: SHA-1
+
+[Back](../README.md)
 
 Implementing SHA-1 and see if I can optimize something with a low level call. Reference for the SHA-1 taken from an old code I had as well as the Wikipedia psuedo code, only targetting MacOS
 
@@ -14,7 +16,7 @@ Endian Conversion with `OSByteOrder.h`, this probably gets converted into `bswap
       (((state[i]) >> 24) & 0x000000ff)
 
   // Replaced with MacOS OSByteOrder.h
-  state[i] = OSSwapHostToBigInt32(i);
+  state[i] = OSSwapHostToBigInt32(state[i]);
 ```
 
 ## Reference
