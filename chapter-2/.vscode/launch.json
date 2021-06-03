@@ -7,8 +7,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug Chapter 2",
-      "program": "${workspaceFolder}/main",
+      "name": "Debug Chapter 2.1",
+      "program": "${workspaceFolder}/2.1/main",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Chapter 2.2",
+      "program": "${workspaceFolder}/2.2/main",
       "args": [],
       "cwd": "${workspaceFolder}"
     }
