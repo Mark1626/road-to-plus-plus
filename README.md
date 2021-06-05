@@ -15,6 +15,10 @@ Below each chapter noting down the things I learnt in the process
 - [Chapter 4 - Perlin Noise](./chapter-4/README.md)
   + 4.1 Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
 
+- Paraphernalia
+  + Basic spawning threads with pthread and <thread>
+  + Basic forking process
+
 ## Rough brainstorm of ideas
 
 - [] Go through [CPP Tutor](https://github.com/banach-space/cpp-tutor)
