@@ -16,6 +16,9 @@ test: perlin.o test.cpp
 main: perlin.o main.cpp
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
+mainMPandASM: main.cpp
+	$(CXX) -S $^ $(CXXFLAGS) $(MPFLAGS)
+
 omain: perlin.o main.cpp
 	$(CXX) -o $@ $^ $(CXXFLAGS) -O3
 
@@ -26,6 +29,6 @@ pomain: perlin.o main.cpp
 	$(CXX) -o $@ $^ $(CXXFLAGS) -O3 $(MPFLAGS)
 
 clean:
-	rm *.o *.gch main omain pmain pomain test
+	rm *.o *.gch *.o main omain pmain pomain test
 
 .PHONY: clean all
