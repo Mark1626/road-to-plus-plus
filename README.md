@@ -10,6 +10,7 @@ This repo contains things I'm going to try out to learn C++
   + Setting up LLDB with VSCode
 - [Chapter 3 - SHA-1](./chapter-3/README.md)
   + Endian Conversion optimization with `OSByteOrder.h` for MacOS, this probably gets converted into `bswap` or `movbe` need to check which instruction
+- [Chapter 4 - Perlin Noise]()
 
 ## Rough brainstorm of ideas
 
