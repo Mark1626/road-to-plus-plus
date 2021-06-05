@@ -10,6 +10,9 @@ main.o: sha1.o main.cpp
 main: $(OBJS) main.cpp
 	$(CXX) -o $@ $(OBJS) $(CXXFLAGS)
 
+mainAsm: $(OBJS) main.cpp
+	$(CXX) -S sha1.hpp sha1.cpp main.cpp $(CXXFLAGS)
+
 .PHONY: clean
 
 clean:

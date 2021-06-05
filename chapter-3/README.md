@@ -9,6 +9,8 @@ Assertion is the main file itself
 
 Endian Conversion with `OSByteOrder.h`, this probably gets converted into `bswap` or `movbe`, need to check which instruction
 
+> Update: In Mac it's bswap
+
 ```cpp
    state[i] = (((state[i]) << 24) & 0xff000000) |
       (((state[i]) << 8) & 0x00ff0000) |
