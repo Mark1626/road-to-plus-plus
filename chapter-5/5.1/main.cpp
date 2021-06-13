@@ -15,4 +15,10 @@ int main() {
 #else
   sandpile.serialize();
 #endif
+
+#ifdef ANIMATE
+// 3s delay to close
+for(int i = 0; i < 180; ++i)
+  sandpile.serialize();
+#endif
 }

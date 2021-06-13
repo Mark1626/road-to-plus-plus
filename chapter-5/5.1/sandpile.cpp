@@ -118,6 +118,11 @@ fprintf(stderr, "Stabilizing with SSE \n");
 #ifdef DEBUG
     print();
 #endif
+
+#ifdef ANIMATE
+  serialize();
+#endif
+
     std::swap(buffer, state);
     if (!spills) {
       return;

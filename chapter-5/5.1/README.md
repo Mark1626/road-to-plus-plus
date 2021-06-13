@@ -2,6 +2,18 @@
 
 Intro to Streaming SIMD instructions. Program is a single threaded implementation to find the identity sandpile
 
+## Usage
+
+For final single image
+
+- `make all WITH_SSE=1 SIZE=6`
+- `./main > sandpile.ppm`
+
+For animation by pipeing to video player
+
+- `make all WITH_SSE=1 SIZE=6 ANIMATE=1`
+- `./main| mpv --no-correct-pts --fps=60 -`
+
 ## Performance
 
 ### 2**8

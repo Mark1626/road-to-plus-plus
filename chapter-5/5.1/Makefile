@@ -12,6 +12,10 @@ ifneq ($(WITH_SSE),)
 CXXFLAGS:=$(CXXFLAGS) -DWITH_SSE
 endif
 
+ifneq ($(ANIMATE),)
+CXXFLAGS:=$(CXXFLAGS) -DANIMATE
+endif
+
 all: main
 
 sandpile.o: sandpile.cpp sandpile.hpp
