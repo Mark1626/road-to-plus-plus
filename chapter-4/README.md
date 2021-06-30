@@ -1,12 +1,22 @@
-# Chapter 4 - Perlin Noise
+# Chapter 4 - OpenMP
+
+## Chapter 4.1 - Perlin Noise
+
+[README](./4.1/README.md)
 
 Perlin Noise is a [embarringly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) task, which makes it a good candidate to start
 
-## Tasks
+## Chapter 4.2 Exploring the depths of OpenMP
 
-- [4.1 OpenMP](./4.1/README.md)
+Case 1 - Reduction
 
+[README](./4.2/README.md)
 
-## TODO
+# FAQ
 
-- 4.2 pthread
+- What is the difference between `critical` and `atomic`
+
+Atomic is used for a single assignment, where as critical is used for a section.
+Atomic can only be used for `++x;`, `--x;`, `x++;`, `x--;`, `x binop= expr;`, `x = x binop expr` or `x = expr binop x`.
+
+[Stackoverflow reference](https://stackoverflow.com/questions/7798010/what-is-the-difference-between-atomic-and-critical-in-openmp)
