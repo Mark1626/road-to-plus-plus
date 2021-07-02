@@ -18,6 +18,9 @@ Below each chapter noting down the things I learnt in the process
   + [4.1](./chapter-4/4.1/README.md) Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
 - [Chapter 5 - Fractals](./chapter-5/README.md)
   + [5.1](./chapter-5/5.1/README.md) Abelian sandpile model with SSE
+- [Chapter CMake](./chapter-cmake/README.md)
+- [Chapter Flex Bison](./chapter-flex-bison/README.md)
+- [Chapter Shared Memory](./chapter-shared-mem/README.md)
 
 - Paraphernalia
   + Basic spawning threads with pthread and <thread>
@@ -30,10 +33,14 @@ Below each chapter noting down the things I learnt in the process
   + [LLVM Hybrid Datastructures](https://www.youtube.com/watch?v=vElZc6zSIXM)
   + [std::allocator](https://www.youtube.com/watch?v=LIb3L4vKZ7U)
 
+- Reads
+  + [Undefined Behaviour](https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html)
+
 ## Tools and Things to Explore
 
 - [perf](https://en.wikipedia.org/wiki/Perf_(Linux))
 - [gprof]()
+- [valgrind]()
 - [vtune](https://en.wikipedia.org/wiki/VTune)
 - [Google Benchmark]()
 - [Google Test]()
