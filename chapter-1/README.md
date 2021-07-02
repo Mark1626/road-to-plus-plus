@@ -107,7 +107,153 @@ type_crx b1 = 10;
 auto b2 = crx
 ```
 
+### valarray - slice and gslice
+
+#### slice
+
+```cpp
+
+  0  1  2  3
+  4  5  6  7
+  8  9 10 11
+  12 13 14 15
+
+  std::valarray<int> val(16);
+
+  // Row 0, 1, 2, 3
+  val[std::slice(0, 4, 1)];
+
+  // Column 0, 4, 8, 12
+  val[std::slice(0, 4, 4)];
+
+  // Major Diagonal 0, 5, 10, 15
+  val[std::slice(0, 4, 5)];
+
+  // Minor Diagonal 3, 6, 9, 12
+  val[std::slice(3, 4, 3)];
+```
+
+#### gslice
+
+```
+Assume a 2 D array
+
+Example
+
+ 0  1  2  3
+ 4  5  6  7
+ 8  9 10 11
+12 13 14 15
+
+-------------------
+
+val[std::gslice(0, {4, 2}, {4, 1})]
+
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+start=0:             *
+                     |
+size=4, stride=4:    *-----------*-----------*-------------*------------*
+                     |           |           |             |            |
+size=2, stride=1:    *--*        *--*        *--*          *---*        *---*
+                     |  |        |  |        |  |          |   |        |   |
+gslice:              *  *        *  *        *  *          *   *        *   *
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+
+-------------------
+
+Rows
+
+val[std::gslice(0, {4}, {1})]
+
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+start=0:             *
+                     |
+size=4, stride=1:    *-----------*-----------*-------------*------------*
+                     |           |           |             |            |
+gslice:              *           *           *             *            *
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+
+-------------------
+
+Column
+
+val[std::gslice(0, {4}, {4})]
+
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+start=0:             *
+                     |
+size=4, stride=4:    *-----------*-----------*-------------*------------*
+                     |           |           |             |            |
+gslice:              *           *           *             *            *
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+
+-------------------
+
+Major Diagonal
+
+  0  1  2  3
+  4  5  6  7
+  8  9 10 11
+  12 13 14 15
+
+  0, 5, 10, 15
+
+val[std::gslice(0, {4}, {5})]
+
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+start=0:             *
+                     |
+size=4, stride=5:    *--------------*--------------*--------------------*
+                     |              |              |                    |
+gslice:              *              *              *                    *
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+
+-------------------
+
+Minor Diagonal
+
+  0  1  2  3
+  4  5  6  7
+  8  9 10 11
+  12 13 14 15
+
+ 3, 6, 9, 12
+
+val[std::gslice(3, {4}, {3})]
+
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+start=3:                      *
+                              |
+size=4, stride=3:             *--------*--------*-----------*
+                              |        |        |           |
+gslice:                       *        *        *           *
+                    [0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15]
+```
+
+### Rule of Zero
+
+Classes that have custom destructors, copy/move assignment should deal with ownership exclusively. Other classes should not have touch with the ownership
+
+```cpp
+class Test {
+  std::vector arr;
+  public:
+  Test(std::vector arr) : arr(arr) {}; // We rely on std::vector to manage it's own resources
+};
+```
+
+### Rule of Five
+
+When creating a class which is going to manage it's own resources 
+always define these 5 member functions
+2. Destructor
+3. Copy Ctor
+3. Copy Assignment
+4. Move Ctor
+5. Move Assignment
+
 ## References
 
 - [CPP Tutor](https://github.com/banach-space/cpp-tutor)
 - [auto vs decltype](http://thbecker.net/articles/auto_and_decltype/section_01.html)
+- [gslice](http://www.cplusplus.com/reference/valarray/gslice/)
