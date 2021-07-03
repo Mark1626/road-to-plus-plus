@@ -42,10 +42,16 @@ Below each chapter noting down the things I learnt in the process
 - [gprof]()
 - [valgrind]()
 - [vtune](https://en.wikipedia.org/wiki/VTune)
+- [OpenMP]()
+- [OpenMPI]()
 - [Google Benchmark]()
 - [Google Test]()
 - [rr]()
 - [lldb]()
+
+## Books
+
+- [Introduction to High Performance Scientific Computing](https://pages.tacc.utexas.edu/~eijkhout/istc/html/index.html)
 
 ## Guides
 
