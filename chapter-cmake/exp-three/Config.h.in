@@ -1,0 +1,2 @@
+#define ExpThree_VERSION @ExpThree_VERSION_MAJOR@
+#define ExpThree_CUSTOM_MESSAGE "WoRlD"
