@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SANDPILE_H
+#define SANDPILE_H
 
 #include <cstdint>
 #include <cstring>
@@ -12,7 +13,9 @@ private:
   char *state;
   char *buffer;
   void stabilize();
+  #ifdef WITH_SSE
   void sse_stabilize();
+  #endif
   inline size_t resolveIdx(size_t y, size_t x) { return y * points + x; }
 
 public:
@@ -34,3 +37,5 @@ public:
   }
 };
 } // namespace Fractal
+
+#endif

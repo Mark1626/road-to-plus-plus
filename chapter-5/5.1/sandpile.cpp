@@ -3,10 +3,14 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
+
+#ifdef WITH_SSE
 #include <emmintrin.h>
 #include <immintrin.h>
 #include <smmintrin.h>
 #include <xmmintrin.h>
+#endif
 
 namespace Fractal {
 
@@ -48,6 +52,7 @@ fprintf(stderr, "Stabilizing \n");
   }
 }
 
+#ifdef WITH_SSE
 void printV(char* msg, __m128 v) {
   uint8_t test[16] = {0};
   printf("%s \n", msg);
@@ -57,7 +62,9 @@ void printV(char* msg, __m128 v) {
   }
   printf("\n\n");
 }
+#endif
 
+#ifdef WITH_SSE
 void Sandpile::sse_stabilize() {
 #ifdef DEBUG
   uint32_t iter = 0;
@@ -129,6 +136,7 @@ fprintf(stderr, "Stabilizing with SSE \n");
     }
   }
 }
+#endif
 
 void Sandpile::computeIdentity() {
   // f(ones(n)*6 - f(ones(n)*6)
