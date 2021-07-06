@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -Wextra -Werror -g -std=c++11
+CXXFLAGS=-Wall -Wextra -O3 -g -std=c++11 -isystem /usr/local/include -L/usr/local/lib
 MPFLAGS=-Xpreprocessor -fopenmp -lomp
 
 ifneq ($(VERBOSE),)
@@ -13,20 +13,11 @@ perlin.o: perlin.cpp perlin.hpp
 test: perlin.o test.cpp
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-main: perlin.o main.cpp
-	$(CXX) -o $@ $^ $(CXXFLAGS)
+main.o: perlin.o main.cpp
+	$(CXX) -c $^ $(CXXFLAGS) $(MPFLAGS)
 
-mainMPandASM: main.cpp
-	$(CXX) -S $^ $(CXXFLAGS) $(MPFLAGS)
-
-omain: perlin.o main.cpp
-	$(CXX) -o $@ $^ $(CXXFLAGS) -O3
-
-pmain: perlin.o main.cpp
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(MPFLAGS)
-
-pomain: perlin.o main.cpp
-	$(CXX) -o $@ $^ $(CXXFLAGS) -O3 $(MPFLAGS)
+main: main.o
+	$(CXX) -o main perlin.o main.o $(CXXFLAGS) $(MPFLAGS)
 
 clean:
 	rm *.o *.gch *.o main omain pmain pomain test

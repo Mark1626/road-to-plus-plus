@@ -13,16 +13,17 @@ int main() {
   Perlin *noise = new Perlin(100);
   float* noiseMap = new float[HEIGHT * WIDTH];
 
-  uint32_t x, y;
-
-  #pragma omp parallel for private(y)
-  for (x = 0; x < HEIGHT; ++x) {
-    for (y = 0; y < WIDTH; ++y) {
-      size_t idx = (x * WIDTH) + y;
-#ifdef VERBOSE
-      std::printf("%d %d %zu\n", x, y, idx);
-#endif
-      noiseMap[idx] = noise->noise2D(x * 0.1f, y * 0.1f);
+  #pragma omp parallel shared(noise, noiseMap)
+  {
+    #pragma omp parallel for
+    for (uint32_t x = 0; x < HEIGHT; ++x) {
+      for (uint32_t y = 0; y < WIDTH; ++y) {
+        size_t idx = (x * WIDTH) + y;
+  #ifdef VERBOSE
+        std::printf("%d %d %zu\n", x, y, idx);
+  #endif
+        noiseMap[idx] = noise->noise2D(x * 0.1f, y * 0.1f);
+      }
     }
   }
 
