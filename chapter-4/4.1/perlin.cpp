@@ -5,18 +5,6 @@
 
 namespace Noise {
 
-Perlin::Perlin() : Perlin(0) {}
-Perlin::Perlin(float seed) : perm(new uint8_t[256]), gradP(new Vec3 [256]) { seedNoise(seed); }
-
-Perlin::~Perlin() {
-  if (perm != nullptr) {
-    delete[] perm;
-  }
-  if (gradP != nullptr) {
-    delete [] gradP;
-  }
-}
-
 void Perlin::seedNoise(float seed) {
   if (seed > 0 && seed < 1) {
     // Scale the seed out

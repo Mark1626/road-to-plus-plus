@@ -2,6 +2,8 @@
 
 Start with a embarrsingly parallel task. Compute perlin noise for `10**4 * 10**4` points
 
+> **Note:** For some reason this is not working all of a sudden
+
 ## Building
 
 ```

@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -Wextra -g -std=c++11 -Xpreprocessor -fopenmp -lomp
+CXXFLAGS=-Wall -Wextra -g -std=c++11 -O3 -fopenmp
 
 %.asm: %.cpp
 	$(CXX) -S $^ $(CXXFLAGS)

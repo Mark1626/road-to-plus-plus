@@ -2,37 +2,27 @@
 
 #include <cstdint>
 #include <cstdio>
-#include <thread>
-
-#define HEIGHT 10000
-#define WIDTH 10000
-
-using namespace Noise;
+#include <array>
 
 int main() {
-  Perlin *noise = new Perlin(100);
-  float* noiseMap = new float[HEIGHT * WIDTH];
+  const int HEIGHT = 100;
+  const int WIDTH = 100;
+  Noise::Perlin noise(100);
+  std::array<float, (HEIGHT * WIDTH)> noiseMap = {};
 
-  #pragma omp parallel shared(noise, noiseMap)
-  {
-    #pragma omp parallel for
-    for (uint32_t x = 0; x < HEIGHT; ++x) {
-      for (uint32_t y = 0; y < WIDTH; ++y) {
-        size_t idx = (x * WIDTH) + y;
-  #ifdef VERBOSE
-        std::printf("%d %d %zu\n", x, y, idx);
-  #endif
-        noiseMap[idx] = noise->noise2D(x * 0.1f, y * 0.1f);
-      }
+  #pragma omp parallel for
+  for (int x = 0; x < HEIGHT; ++x) {
+    for (int y = 0; y < WIDTH; ++y) {
+      int idx = (x * WIDTH) + y;
+      noiseMap[idx] = noise.noise2D(x * 0.1f, y * 0.1f);
+        // noiseMap[idx] = 1.0f;//noise.noise2D(x * 0.1f, y * 0.1f);
     }
   }
 
-#ifdef VERBOSE
-  for (uint32_t i = 0; i < HEIGHT * WIDTH; ++i) {
-    std::printf("%f ", noiseMap[i]);
-  }
-  std::printf("\n");
-#endif
-
-  delete [] noiseMap;
+// #ifdef VERBOSE
+//   for (uint32_t i = 0; i < HEIGHT * WIDTH; ++i) {
+//     std::printf("%f ", noiseMap[i]);
+//   }
+//   std::printf("\n");
+// #endif
 }
