@@ -14,3 +14,4 @@
 > **Note:** `CMAKE_C_COMPILER` **should not be set** in `CMakeLists` with `set` instead we pass it as an argument and get it checked in `CMakeCache`
 
 See [this question](https://discourse.cmake.org/t/proper-way-to-set-compiler-and-language-standard-in-cmake/2756) and [this stackoverflow question](https://stackoverflow.com/questions/17275348/how-to-specify-new-gcc-path-for-cmake)
+- **Exp-6:** Use a library installed in `/usr/local/lib`
