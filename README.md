@@ -21,11 +21,13 @@ Below each chapter noting down the things I learnt in the process
 - [Chapter CMake](./chapter-cmake/README.md)
 - [Chapter Flex Bison](./chapter-flex-bison/README.md)
 - [Chapter Shared Memory](./chapter-shared-mem/README.md)
+- [Chapter Auto Vectorization - WIP](./chapter-auto-vectorize/README.md)
 
 - Paraphernalia
   + Basic spawning threads with pthread and <thread>
   + Basic forking process
   + SSE condition paraphernalia
+  + Open MPI
 
 
 - Talks
@@ -61,8 +63,6 @@ Below each chapter noting down the things I learnt in the process
 ## Rough brainstorm of ideas
 
 - [] Go through [CPP Tutor](https://github.com/banach-space/cpp-tutor)
-- [] Build a Game of Life which could work for large cells
-- [] Segmented Sieve of Erathosthanes for 10**12!?
 - [x] Understand debugging with `lldb`
 - [] Try out `rr`
 - [] Contribute to a OSS project using C++
