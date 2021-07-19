@@ -2,6 +2,8 @@
 
 Intro to Streaming SIMD instructions. Program is a single threaded implementation to find the identity sandpile
 
+> **Note:** Written for clang 12
+
 ## Usage
 
 For final single image
