@@ -29,7 +29,7 @@ Below each chapter noting down the things I learnt in the process
   + Basic spawning threads with pthread and `<thread>`
   + Basic forking process
   + SSE condition paraphernalia
-  + Open MPI
+  + Opening Ini file
 
 
 - Talks
