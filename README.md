@@ -22,7 +22,7 @@ Below each chapter noting down the things I learnt in the process
   + [5.1](./chapter-5/5.1/README.md) Abelian sandpile model with SSE
 - [Chapter CMake](./chapter-cmake/)
 - [Chapter Flex Bison](./chapter-flex-bison/)
-- [Chapter Shared Memory](./chapter-shared-mem/)
+- [Chapter Multi Process](./chapter-multi-process/)
 - [Chapter Auto Vectorization - WIP](./chapter-auto-vectorization/)
 
 - Paraphernalia
