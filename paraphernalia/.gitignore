@@ -1,2 +1,7 @@
 spawn-pthread
 spawn-thread-11
+sse
+avalanche
+omp
+mpi-test
+read-ini

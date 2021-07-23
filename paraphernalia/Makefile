@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -Wextra -std=c++11 -O3
+CXXFLAGS=-Wall -Wextra -std=c++11 -Ofast -Xpreprocessor -fopenmp -lomp
 
 all: spawn-thread-11 spawn-pthread fork sse
 
