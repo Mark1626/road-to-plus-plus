@@ -28,9 +28,9 @@ void func(int *a, int *b, int N) {
 ```
 
 
-### Common things to understand
+### Case Studies
 
-#### restrict
+#### Case Study 1 - Aliasing - Potentially Overlapping Pointers
 
 ```cpp
 void mul(int *__restrict__ a, int *__restrict__ b) {
@@ -46,9 +46,24 @@ In the above example without the `__restrict__` the compiler has no way to know 
 
 > **Note :** In clang with -O3 for the above example is vectorized but it's auto vectorization, but without `__restrict__` the compiler will generate two function a scalar and vector and use the corresponding one after checking for overlap. For further details read [Clang runtime checks of pointers](https://llvm.org/docs/Vectorizers.html#runtime-checks-of-pointers)
 
-#### Case Study 1
+##### OpenMP SIMD
 
-In the below code vectorization is valid only when elements of `d` are distinct, I couldn't get clang and gcc to vectorize it. I was able to vectorize by adding the `omp simd` pragma
+The same can be achieved with a OpenMP directive
+
+```cpp
+void mul(int *a, int *b) {
+  #pragma omp simd
+  for (int i = 0; i < 64; i++) {
+    a[i] *= b[i];
+  }
+}
+```
+
+#### Case Study 2 - Correctness N Distinct Elements
+
+> I wasn't able to achieve this in GCC
+
+In the below code vectorization is valid only when elements of `d` are distinct, I couldn't get clang and gcc to vectorize it. I was able to vectorize by adding the `omp simd` pragma in `clang`
 
 [Case Study 1 in Godbolt](https://godbolt.org/z/c68h7z6Ks)
 
@@ -60,7 +75,7 @@ for (int i = 0; i < N; i++) {
 }
 ```
 
-#### Case Study 2 - Functions
+#### Case Study 3 - Functions
 
 ```cpp
 float s;
@@ -71,14 +86,41 @@ for (int i = 0; i < N; i++) {
 }
 ```
 
+#### Case Study 4 - Albeian Sandpile
+
+```cpp
+void fn(char* buffer, char* state) {
+  int spills = 0;
+
+  for (size_t y = 1; y <= pixel; ++y) {
+    for (size_t x = 1; x <= pixel; ++x) {
+      char currSand = buffer[resolveIdx(y, x)];
+      char newSand = currSand >= 4 ? currSand - 4 : currSand;
+      spills += currSand >= 4;
+      // Spill over from neighbours
+      newSand += buffer[resolveIdx((y - 1), x)] >= 4;
+      newSand += buffer[resolveIdx((y + 1), x)] >= 4;
+      newSand += buffer[resolveIdx(y, (x - 1))] >= 4;
+      newSand += buffer[resolveIdx(y, (x + 1))] >= 4;
+
+      state[resolveIdx(y, x)] = newSand;
+    }
+  }
+}
+```
+
+#### Case Study - Alignment
+
 ## Reference
 
 - [LLVM Loop Vectorization](https://llvm.org/docs/Vectorizers.html#the-loop-vectorizer)
 - [Open MP Auto Vectorization](https://pages.tacc.utexas.edu/~eijkhout/pcse/html/omp-simd.html)
 - [Open MP Vectorization Examples](https://hpac.cs.umu.se/teaching/pp-16/material/08.OpenMP-4.pdf)
+- [SIMD Programming and What you need to know about CPU Peak FLOPS](https://www.eidos.ic.i.u-tokyo.ac.jp/~tau/lecture/parallel_distributed/2016/slides/pdf/simd.pdf)
+
 
 ## See Also
 
 - [Auto Vectorization](https://mark1626.github.io/knowledge/languages/c-compiler/auto-vectorization.html)
 - [GCC Open Vectorization Tasks](https://gcc.gnu.org/wiki/VectorizationTasks)
-
+- [Memory Layout Transformations](https://software.intel.com/content/www/us/en/develop/articles/memory-layout-transformations.html)

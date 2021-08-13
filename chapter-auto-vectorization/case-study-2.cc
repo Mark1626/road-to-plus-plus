@@ -1,10 +1,4 @@
-#include <array>
-#include <emmintrin.h>
-#include <iostream>
-
-#include <immintrin.h>
-
-void case_study_1(int *__restrict__ a, int *__restrict__ b, int *__restrict__ d,
+void case_study_2(int *__restrict__ a, int *__restrict__ b, int *__restrict__ d,
                   int N) {
   const int s = 10;
   #pragma omp simd
@@ -27,5 +21,3 @@ void case_study_1(int *__restrict__ a, int *__restrict__ b, int *__restrict__ d,
 //     a[j] += s * b[i];
 //   }
 // }
-
-int main() {}
