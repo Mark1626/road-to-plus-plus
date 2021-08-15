@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -Wextra -g -std=c++11 -O3
+CXXFLAGS=-Wall -Wextra -g -std=c++11 -O3 -march=native
 
 ifneq ($(SIZE),)
 CXXFLAGS:=$(CXXFLAGS) -DSIZE=$(SIZE)

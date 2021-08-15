@@ -2,7 +2,7 @@
 #include <algorithm>
 
 const int pixel = 1<<8;
-const int points = 1<<8;
+const int points = pixel+1;
 inline size_t resolveIdx(size_t y, size_t x) { return y * points + x; }
 
 void fn(char* buffer, char* state) {

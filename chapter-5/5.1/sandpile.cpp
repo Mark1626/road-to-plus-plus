@@ -53,7 +53,7 @@ fprintf(stderr, "Stabilizing \n");
 }
 
 #ifdef WITH_SSE
-void printV(char* msg, __m128 v) {
+void printV(char* msg, __m128i v) {
   uint8_t test[16] = {0};
   printf("%s \n", msg);
   _mm_storeu_si128((__m128i_u*)test, v);
@@ -85,12 +85,12 @@ fprintf(stderr, "Stabilizing with SSE \n");
       for (size_t x = 1; x <= pixel; x += 16) {
         // Since there is no way to operate over each byte in the vector,
         // we sub then blend based on compare result
-        __m128 sand =
+        __m128i sand =
             _mm_loadu_si128((const __m128i_u *)(buffer + resolveIdx(y, x)));
         // No gte for epi8
-        __m128 cmp = _mm_cmpgt_epi8(sand, _mm_set1_epi8(3));
-        __m128 diff = _mm_sub_epi8(sand, _mm_set1_epi8(4));
-        __m128 newSand = _mm_blendv_epi8(sand, diff, cmp);
+        __m128i cmp = _mm_cmpgt_epi8(sand, _mm_set1_epi8(3));
+        __m128i diff = _mm_sub_epi8(sand, _mm_set1_epi8(4));
+        __m128i newSand = _mm_blendv_epi8(sand, diff, cmp);
 
         // Non zero spills
         spills += !_mm_testz_si128(cmp, cmp);
@@ -100,7 +100,7 @@ fprintf(stderr, "Stabilizing with SSE \n");
         // based on cmp
         sand = _mm_loadu_si128((const __m128i_u *)(buffer + resolveIdx(y - 1, x)));
         cmp = _mm_cmpgt_epi8(sand, _mm_set1_epi8(3));
-        __m128 sum = _mm_add_epi8(newSand, _mm_set1_epi8(1));
+        __m128i sum = _mm_add_epi8(newSand, _mm_set1_epi8(1));
         newSand = _mm_blendv_epi8(newSand, sum, cmp);
 
         sand = _mm_loadu_si128((const __m128i_u *)(buffer + resolveIdx(y + 1, x)));

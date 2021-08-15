@@ -11,6 +11,8 @@
 - [2.2](./2.2/README.md) GOL with SSE, interesting thing I noticed is that the first execution was a bit slower compared to the others. CPU Cache??
 A basic Game of Life, added entities like a Glider Gun to test it
 
+> Note: I accidentally forgot to check this in
+
 ## TODO
 
 - Scale this

@@ -20,3 +20,5 @@ Atomic is used for a single assignment, where as critical is used for a section.
 Atomic can only be used for `++x;`, `--x;`, `x++;`, `x--;`, `x binop= expr;`, `x = x binop expr` or `x = expr binop x`.
 
 [Stackoverflow reference](https://stackoverflow.com/questions/7798010/what-is-the-difference-between-atomic-and-critical-in-openmp)
+
+- [OpenMP Cancel](http://jakascorner.com/blog/2016/08/omp-cancel.html)
