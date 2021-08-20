@@ -18,13 +18,17 @@ Below each chapter noting down the things I learnt in the process
   + Endian Conversion optimization with `OSByteOrder.h` for Mac, this is converted into `bswap`, checked it by inspecting the generated ASM
 - [Chapter 4 - Perlin Noise](./chapter-4/)
   + [4.1](./chapter-4/4.1/) Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
+  + [4.2](./chapter-4/)
 - [Chapter 5 - Fractals](./chapter-5/)
   + [5.1](./chapter-5/5.1/) Abelian sandpile model with SSE
   + [5.2](./chapter-5/5.2/) Mandelbrot set with OpenMP
+  + [5.3](./chapter-5/5.3/) Abelian sandpile model with auto vectorization for non square grids
 - [Chapter CMake](./chapter-cmake/)
 - [Chapter Flex Bison](./chapter-flex-bison/)
 - [Chapter Multi Process](./chapter-multi-process/)
-- [Chapter Auto Vectorization - WIP](./chapter-auto-vectorization/)
+- [Chapter Auto Vectorization](./chapter-auto-vectorization/)
+- [Chapter Profiling](./chapter-profiling/)
+- [Chapter Benchmarks](./chapter-benchmark/)
 
 - Paraphernalia
   + Basic spawning threads with pthread and `<thread>`
@@ -40,6 +44,7 @@ Below each chapter noting down the things I learnt in the process
 
 - Reads
   + [Undefined Behaviour](https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html)
+  + [Hybrid Parallel Programming](https://openmp.org/wp-content/uploads/HybridPP_Slides.pdf)
 
 ## Tools and Things to Explore
 

@@ -12,7 +12,11 @@ Case 1 - Reduction
 
 [README](./4.2/README.md)
 
-# FAQ
+## Debugging
+
+- [libgomp DEBUG](https://gcc.gnu.org/onlinedocs/libgomp/GOMP_005fDEBUG.html)
+
+## FAQ
 
 - What is the difference between `critical` and `atomic`
 
@@ -20,5 +24,7 @@ Atomic is used for a single assignment, where as critical is used for a section.
 Atomic can only be used for `++x;`, `--x;`, `x++;`, `x--;`, `x binop= expr;`, `x = x binop expr` or `x = expr binop x`.
 
 [Stackoverflow reference](https://stackoverflow.com/questions/7798010/what-is-the-difference-between-atomic-and-critical-in-openmp)
+
+## Reading
 
 - [OpenMP Cancel](http://jakascorner.com/blog/2016/08/omp-cancel.html)

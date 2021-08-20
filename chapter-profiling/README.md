@@ -184,6 +184,34 @@ perf script -F+srcline -F-period -F-time -F-dso -F+sym -F-symoff | srcline-occur
 perf script -F+pid | split-process.pl
 ```
 
+## Exp-6 GCC Profile Guided Optimizations -fprofile-generate
+
+> **Note :** This is really magical
+
+```bash
+g++ -o sandpile sandpile.cc -O3 -fprofile-generate
+
+# Do a run and generate a profile sandpile.gcda
+./sandpile > out.ppm
+
+# Recompile with profile information
+g++ -o sandpile sandpile.cc -O3 -fprofile-use=sandpile.gcda
+```
+
+Before profiling
+```
+./sandpile > out.ppm  4.45s user 0.00s system 90% cpu 4.919 total
+./sandpile > out.ppm  4.50s user 0.00s system 99% cpu 4.512 total
+./sandpile > out.ppm  4.51s user 0.01s system 99% cpu 4.526 total
+```
+
+After profiling
+
+```
+./sandpile > out.ppm  0.68s user 0.00s system 59% cpu 1.156 total
+./sandpile > out.ppm  0.74s user 0.00s system 99% cpu 0.750 total
+./sandpile > out.ppm  0.73s user 0.00s system 99% cpu 0.739 total
+```
 
 ## Reference
 

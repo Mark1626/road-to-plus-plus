@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# perf script -F+srcline -F-period -F-time -F-dso -F+sym -F-symoff | srcline-occurance.pl
 use strict;
 
 my %sym_occurance = ();

@@ -117,6 +117,7 @@ void fn(char* buffer, char* state) {
 - [Open MP Auto Vectorization](https://pages.tacc.utexas.edu/~eijkhout/pcse/html/omp-simd.html)
 - [Open MP Vectorization Examples](https://hpac.cs.umu.se/teaching/pp-16/material/08.OpenMP-4.pdf)
 - [SIMD Programming and What you need to know about CPU Peak FLOPS](https://www.eidos.ic.i.u-tokyo.ac.jp/~tau/lecture/parallel_distributed/2016/slides/pdf/simd.pdf)
+- [Program Optimization through Loop Vectorization](https://www.cs.utexas.edu/~pingali/CS377P/2017sp/lectures/david-vectorization.pdf)
 
 
 ## See Also
