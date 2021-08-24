@@ -4,6 +4,7 @@
 #include <smmintrin.h>
 #include <string>
 #include <xmmintrin.h>
+#include "Config.h"
 
 namespace FractalSSE {
 class Sandpile {
@@ -32,7 +33,7 @@ public:
   void stabilize();
 
   void computeIdentity() {
-    std::fprintf(stderr, "WITH_SSE\n");
+    // std::fprintf(stderr, "WITH_SSE\n");
     // f(ones(n)*6 - f(ones(n)*6)
     for (size_t y = 1; y <= pixel; ++y) {
       for (size_t x = 1; x <= pixel; ++x) {
@@ -127,3 +128,13 @@ void Sandpile::stabilize() {
 }
 
 } // namespace FractalSSE
+
+#ifdef BINARY
+
+int main() {
+  FractalSSE::Sandpile sandpile(1<<SIZE);
+  sandpile.computeIdentity();
+  sandpile.serialize(stdout);
+}
+
+#endif

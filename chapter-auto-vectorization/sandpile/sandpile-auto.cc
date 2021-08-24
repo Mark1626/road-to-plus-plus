@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <cstdio>
 
 #include "Config.h"
 
@@ -70,7 +71,7 @@ void Sandpile::stabilize(std::int8_t *__restrict__ buffer,
 }
 
 void Sandpile::computeIdentity() {
-  std::fprintf(stderr, "WITH_Auto\n");
+  // std::fprintf(stderr, "WITH_Auto\n");
   // f(ones(n)*6 - f(ones(n)*6)
 
   std::int8_t *buffer = _buffer.data();
@@ -94,3 +95,13 @@ void Sandpile::computeIdentity() {
 }
 
 } // namespace FractalAutoVec
+
+#ifdef BINARY
+
+int main() {
+  FractalAutoVec::Sandpile sandpile;
+  sandpile.computeIdentity();
+  sandpile.serialize(stdout);
+}
+
+#endif

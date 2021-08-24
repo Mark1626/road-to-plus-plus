@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <string>
+#include "Config.h"
 
 namespace Fractal {
 
@@ -27,7 +28,7 @@ public:
     }
   }
   void computeIdentity() {
-    std::fprintf(stderr, "WITH_Normal\n");
+    // std::fprintf(stderr, "WITH_Normal\n");
     // f(ones(n)*6 - f(ones(n)*6)
     for (size_t y = 1; y <= pixels; ++y) {
       for (size_t x = 1; x <= pixels; ++x) {
@@ -93,3 +94,13 @@ void Sandpile::stabilize() {
   }
 }
 } // namespace Fractal
+
+#ifdef BINARY
+
+int main() {
+  Fractal::Sandpile sandpile(1<<SIZE);
+  sandpile.computeIdentity();
+  sandpile.serialize(stdout);
+}
+
+#endif

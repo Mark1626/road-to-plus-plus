@@ -28,3 +28,4 @@ FetchContent_MakeAvailable(googletest googlebenchmark)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+add_subdirectory(sandpile)
