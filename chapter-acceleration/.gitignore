@@ -1,0 +1,10 @@
+.vscode
+vector_add_cpu
+vector_add_gpu
+*.ppm
+gol_cpu
+gol_gpu
+mandel.cl
+mandel.cc
+sandpile.cl
+*.dSYM
