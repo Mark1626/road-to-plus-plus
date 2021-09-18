@@ -9,8 +9,8 @@
 // #define GPU
 
 #ifdef WITH_PPM
-#include <fstream>
-#include <ppm/ppm.hpp>
+#include <cstdio>
+#include "ppm.h"
 #endif
 
 using std::string;
@@ -181,7 +181,7 @@ class Board {
   int width;
   int height;
 #ifdef WITH_PPM
-  PPM ppm;
+  ppm ppm;
 #endif
   const size_t board_size;
   bool *board;
@@ -190,7 +190,7 @@ public:
   Board(int width, int height)
       : width(width), height(height),
 #ifdef WITH_PPM
-        ppm(width, height),
+        ppm(ppm_init(width, height)),
 #endif
         board_size(width * height) {
     board = new bool[board_size];
@@ -201,6 +201,9 @@ public:
   }
 
   ~Board() {
+    #ifdef WITH_PPM
+    ppm_destroy(&ppm);
+    #endif
     if (board) {
       delete[] board;
     }
@@ -269,8 +272,8 @@ public:
 
       for (int x = 0; x < width; x++) {
 #ifdef WITH_PPM
-        board[i] ? ppm.set(x, y, RGB(255, 255, 255))
-                 : ppm.set(x, y, RGB(0, 0, 0));
+        board[i] ? ppm_set(&ppm, x, y, RGB{255, 255, 255})
+                 : ppm_set(&ppm, x, y, RGB{0, 0, 0});
 
 #else
         std::cout << (board[i] ? "*" : " ");
@@ -283,12 +286,13 @@ public:
     }
 #ifdef WITH_PPM
     if (first) {
-
-      std::fstream file("first.ppm", std::ios::out);
-      ppm.write(file);
+      FILE* file = fopen("first.ppm", "r");
+      ppm_serialize(&ppm, file);
+      fclose(file);
     } else {
-      std::fstream file("last.ppm", std::ios::out);
-      ppm.write(file);
+      FILE* file = fopen("last.ppm", "r");
+      ppm_serialize(&ppm, file);
+      fclose(file);
     }
 #endif
   }

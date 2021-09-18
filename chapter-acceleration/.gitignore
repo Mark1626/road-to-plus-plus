@@ -6,5 +6,7 @@ gol_cpu
 gol_gpu
 mandel.cl
 mandel.cc
-sandpile.cl
+cl_info
+atomic
+sandpile
 *.dSYM

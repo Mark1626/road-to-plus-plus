@@ -61,14 +61,22 @@ Below each chapter noting down the things I learnt in the process
 - [rr](https://github.com/rr-debugger/rr)
 - [lldb](https://lldb.llvm.org/use/tutorial.html)
 
+## Topics
+
+- Intrinsics
+- Stream Processing
+- Domain Decomposition
+
 ## Books
 
 - [Introduction to High Performance Scientific Computing](https://pages.tacc.utexas.edu/~eijkhout/istc/html/index.html)
+- [Computer Systems: A Programmer's Perspective]()
 
 ## Guides
 
 - [OpenMP Guide](https://bisqwit.iki.fi/story/howto/openmp/#Abstract)
 - [CPP Tutor](https://github.com/banach-space/cpp-tutor)
+- [StreamProcessing Reading List](https://github.com/ShuhaoZhangTony/StreamProcessing_ReadingList)
 
 ## Blogs
 

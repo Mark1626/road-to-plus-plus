@@ -23,7 +23,7 @@ float smoothstep(float lower, float upper, float x) {
 
 PPM::PPM(size_t width, size_t height)
     : width(width), height(height), buf(3 * width * height, 0),
-      R0((width / 400.0f)), R1((width / 200.0f)), PAD(width / 128){};
+      R0((width / 400.0f)), R1((width / 200.0f)), PAD(width / 128.0f){};
 
 void PPM::write(std::ostream &stream) {
   stream << "P6\n";
