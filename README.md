@@ -11,18 +11,27 @@ Below each chapter noting down the things I learnt in the process
 - [Chapter 1 - Basics](./chapter-1/)
   + 1.1 Learnt a ton of new features available
   + 1.2 Run Time Type Information
+  + 1.3 [Constructors](./chapter-1/ctor.cpp)
+  + 1.3 [Destructor order](./chapter-1/destruct.cc)
 - [Chapter 2 - Game of Life](./chapter-2/)
   - [2.1](./chapter-2/2.1/) Basic GOL with setting up LLDB with VSCode
-  - [2.2](./chapter-2/2.2/) GOL with SSE, interesting thing I noticed is that the first execution was a bit slower compared to the others. CPU Cache??
+  - [2.2](./chapter-2/2.2/) GOL with SSE, interesting thing I noticed is that the first execution was a bit slower compared to the others.
 - [Chapter 3 - SHA-1](./chapter-3/)
-  + Endian Conversion optimization with `OSByteOrder.h` for Mac, this is converted into `bswap`, checked it by inspecting the generated ASM
+  + [3.1](./chapter-3/3.1/)Endian Conversion optimization with `OSByteOrder.h` for Mac, this is converted into `bswap`, checked it by inspecting the generated ASM
+  + [3.2](./chapter-3/3.2/)Image Convolution
 - [Chapter 4 - Perlin Noise](./chapter-4/)
   + [4.1](./chapter-4/4.1/) Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
-  + [4.2](./chapter-4/)
+  + [4.2](./chapter-4/4.2/)OpenMP case studies
 - [Chapter 5 - Fractals](./chapter-5/)
   + [5.1](./chapter-5/5.1/) Abelian sandpile model with SSE
   + [5.2](./chapter-5/5.2/) Mandelbrot set with OpenMP
   + [5.3](./chapter-5/5.3/) Abelian sandpile model with auto vectorization for non square grids
+- [Chapter Acceleration](./chapter-acceleration/)
+  + **exp-1** Get available device info
+  + **exp-2** Vector addition in kernel
+  + **exp-3** Game of Life
+  + **exp-4** Atomics
+  + **exp-5** Abelian Sandpile(not the best example)
 - [Chapter CMake](./chapter-cmake/)
 - [Chapter Flex Bison](./chapter-flex-bison/)
 - [Chapter Multi Process](./chapter-multi-process/)
@@ -77,6 +86,7 @@ Below each chapter noting down the things I learnt in the process
 - [OpenMP Guide](https://bisqwit.iki.fi/story/howto/openmp/#Abstract)
 - [CPP Tutor](https://github.com/banach-space/cpp-tutor)
 - [StreamProcessing Reading List](https://github.com/ShuhaoZhangTony/StreamProcessing_ReadingList)
+- [Domain Decomposition](https://github.com/arielshao/Domain-Decomposition-)
 
 ## Blogs
 
