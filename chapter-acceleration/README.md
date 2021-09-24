@@ -34,6 +34,14 @@ cl::EnqueueArgs args(queue, cl::NullRange, cl::NDRange(10), cl::NullRange);
 atomic_sum(args, bufferSum).wait();
 ```
 
+## Synchronization
+
+- Barriers and memory fence
+
+## Pipes
+
+A pipe is a memory
+
 ## Examples online
 
 - [Sierpinski Carpet](https://software.intel.com/content/www/us/en/develop/articles/sierpinski-carpet-in-opencl-20.html)
@@ -59,6 +67,15 @@ Support for double floating point precision
 
 - [OpenCL Basics](https://sites.google.com/site/csc8820/opencl-basics/opencl-concepts)
 - [OpenCL Reference](https://www.khronos.org/registry/OpenCL/sdk/2.1/docs/man/xhtml/)
+
+
+# Tools and Resources
+
+- [AMD ADL SDK](https://gpuopen.com/adl/)
+- [AMD uprof](https://developer.amd.com/amd-uprof/)
+
+- [GPU Open Libraries and SDKs](https://github.com/GPUOpen-LibrariesAndSDKs)
+- [GPU Open Tools](https://github.com/GPUOpen-Tools)
 
 # OpenACC
 
