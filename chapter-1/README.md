@@ -2,13 +2,84 @@
 
 [Back](../README.md)
 
-## Makefile 101
+## Compilation 101
+
+### Essential Flags
+
+#### -Wall -Wextra -Werror
 
 Set `-Wall -Wextra` to catch a lot of useful compile time warnings
 
 ```make
 CXXFLAGS=-Wall -Wextra
 ```
+
+`-Werror` makes the compiler treat warnings as errors
+
+#### -std= -pedantic
+
+The flag `-std` defines the C / C++ standard
+
+```sh
+c++ -o test test.cc -std=c++14 -pedantic
+
+cc -o test test.c -std=c99 -pedantic
+```
+
+The `-pedantic` will cause the compiler to throw an error when using features which conflict with ISO C or ISO C++
+
+#### -O<n>
+
+Defines the level of optimization
+
+```sh
+-Og
+-O0
+-O1
+-O2
+-O3
+-Ofast
+```
+
+`-O3` should be easy enough to use for most cases
+`-Ofast` is `-O3` + `-ffast-math`, fast math adds some float and double optimization that are unsafe use this only when you know what you are doing
+
+
+#### -g -fno-omit-frame-pointer
+
+`-g` turns on debugging symbols, you will need this to connect your application to a debugger
+
+`-fno-omit-frame-pointer` Enables frame pointer, this is a very essential flag for profiling applications
+
+### Reading flags from a file
+
+```
+c++ $(< flags) test.cc -o test
+```
+
+
+## Preprocessor 101
+
+### Include Guard
+
+```cpp
+// header.hh
+#ifdef HEADER_HH
+#define HEADER_HH
+
+// Method to expose
+
+#endif
+```
+
+```cpp
+// header.hh
+#pragma once
+
+// Method to expose
+
+```
+
 
 ## Basics 101
 
@@ -251,6 +322,62 @@ always define these 5 member functions
 3. Copy Assignment
 4. Move Ctor
 5. Move Assignment
+
+### Packing and Data Structure Alignment
+
+```cpp
+struct SAO_Body {
+  int xno;
+  double sra0;
+  double sdec0;
+  char is[2];
+  unsigned short mag;
+  float xrpm;
+  float xdpm;
+};
+
+assert(sizeof(SAO_Body) == 32) // This is not guaranteed, and differs machine to machine, it was 40 for me
+
+struct __attribute__((__packed__)) SAO_Body {
+  int xno;
+  double sra0;
+  double sdec0;
+  char is[2];
+  unsigned short mag;
+  float xrpm;
+  float xdpm;
+};
+
+assert(sizeof(SAO_Body) == 32) // This struct is packed and guaranteed to be 32 bytes,
+```
+
+> Note: In case your wondering the above struct was used to parse a binary data inside the SAO_Catalog
+
+### Endianess
+
+```cpp
+#if defined(__APPLE__)
+#include <libkern/OSByteOrder.h>
+#define htobe32(x) OSSwapHostToBigInt32(x)
+
+#elif defined(__linux__)
+#include <endian.h>
+#endif
+
+uint8_t* SHA1::digest() {
+  padBlock();
+
+  #ifdef LITTLE_ENDIAN
+    state[0] = htobe32(state[0]);
+    state[1] = htobe32(state[1]);
+    state[2] = htobe32(state[2]);
+    state[3] = htobe32(state[3]);
+    state[4] = htobe32(state[4]);
+  #endif
+
+  return (uint8_t*)state;
+}
+```
 
 ## References
 

@@ -14,6 +14,6 @@ struct B {
 
 int main() {
     A a;
-      B b;
+    B b;
 }
 
