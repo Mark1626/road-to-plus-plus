@@ -10,7 +10,11 @@ Perlin Noise is a [embarringly parallel](https://en.wikipedia.org/wiki/Embarrass
 
 Case 1 - Reduction
 
-[README](./4.2/README.md)
+Case 2 - Case study of cancellation point
+
+> Note: Cancel only cancels current thread
+
+Case 3 - xxtea middle block block collider in GPU
 
 ## Debugging
 
@@ -25,6 +29,11 @@ Atomic can only be used for `++x;`, `--x;`, `x++;`, `x--;`, `x binop= expr;`, `x
 
 [Stackoverflow reference](https://stackoverflow.com/questions/7798010/what-is-the-difference-between-atomic-and-critical-in-openmp)
 
+## GPU
+
+- [OpenMP on GPU](https://on-demand.gputechconf.com/gtc/2018/presentation/s8344-openmp-on-gpus-first-experiences-and-best-practices.pdf)
+
 ## Reading
 
 - [OpenMP Cancel](http://jakascorner.com/blog/2016/08/omp-cancel.html)
+- [OpenMP Guide](https://bisqwit.iki.fi/story/howto/openmp/#Abstract)
