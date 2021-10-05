@@ -19,6 +19,7 @@ Below each chapter noting down the things I learnt in the process
 - [Chapter 3 - SHA-1](./chapter-3/)
   + [3.1](./chapter-3/3.1/)Endian Conversion optimization with `OSByteOrder.h` for Mac, this is converted into `bswap`, checked it by inspecting the generated ASM
   + [3.2](./chapter-3/3.2/)Image Convolution
+  + [3.3](./chapter-3/3.3/)Image Histogram Equalization
 - [Chapter 4 - Perlin Noise](./chapter-4/)
   + [4.1](./chapter-4/4.1/) Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
   + [4.2](./chapter-4/4.2/)OpenMP case studies
