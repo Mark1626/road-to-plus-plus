@@ -45,9 +45,11 @@ void hist_equal(const Matrix input, Matrix &output) {
     pxl_hist_equ[it.first] = round((((double)it.second - 1.0) / 63.0) * 255.0);
   }
 
+  #ifdef DEBUG
   for (auto it : pxl_hist_equ) {
     std::cout << it.first << " " << pxl_histogram[it.first] << " " << pxl_cdf[it.first] << " " << it.second << "\n";
   }
+  #endif
 
   for (auto j = 0; j < N; ++j) {
     for (auto i = 0; i < N; ++i) {

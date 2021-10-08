@@ -1,6 +1,8 @@
 CXXFLAGS = -Wall -Wextra -std=c++11 -g
 OBJS = sha1.o main.o
 
+all: main
+
 sha1.o: sha1.hpp sha1.cpp
 	$(CXX) -c sha1.hpp sha1.cpp $(CXXFLAGS)
 

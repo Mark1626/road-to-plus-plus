@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef PPM_H
 #define PPM_H
@@ -20,6 +22,45 @@ typedef struct {
   float R0;
 #endif
 } ppm;
+
+static ppm *ppm_parse(FILE *stream) {
+  char *line;
+  size_t len;
+  size_t read = getline(&line, &len, stream);
+
+  printf("read: %zu", read);
+
+  // assert magic number
+  if (read > 2) {
+    assert(line[0] == 'P');
+    assert(line[1] == '6');
+  }
+
+  // if(line)
+  //   free(line);
+  // else
+  //  return NULL;
+
+  // find width height
+  ppm *img = (ppm *)malloc(sizeof(ppm));
+
+  read = getline(&line, &len, stream);
+  sscanf(line, "%d %d", &img->width, &img->height);
+
+  // Read depth
+  read = getline(&line, &len, stream);
+
+  // if(line)
+  //   free(line);
+  // else
+  //  return NULL;
+
+  img->buff = (unsigned char*)malloc(3 * img->width * img->height * sizeof(unsigned char));
+  fread(img->buff, 3 * img->width * img->height * sizeof(unsigned char), 1,
+        stream);
+
+  return img;
+}
 
 static ppm ppm_init(const int width, const int height) {
   return (ppm){.width = width,
@@ -99,19 +140,25 @@ static void ppm_dot(ppm *img, float x, float y, RGB fgc) {
 
 // v in range -1.0 to 1.0
 static unsigned long hue(double v) {
-    unsigned long h = (int)((v + 1)*179.5) / 60;
-    unsigned long f = (int)((v + 1)*179.5) % 60;
-    unsigned long t = 0xff * f / 60;
-    unsigned long q = 0xff - t;
-    switch (h) {
-    case 0: return 0xff0000UL | (t << 8);
-    case 1: return (q << 16) | 0x00ff00UL;
-    case 2: return 0x00ff00UL | t;
-    case 3: return (q << 8) | 0x0000ffUL;
-    case 4: return (t << 16) | 0x0000ffUL;
-    case 5: return 0xff0000UL | q;
-    }
-    abort();
+  unsigned long h = (int)((v + 1) * 179.5) / 60;
+  unsigned long f = (int)((v + 1) * 179.5) % 60;
+  unsigned long t = 0xff * f / 60;
+  unsigned long q = 0xff - t;
+  switch (h) {
+  case 0:
+    return 0xff0000UL | (t << 8);
+  case 1:
+    return (q << 16) | 0x00ff00UL;
+  case 2:
+    return 0x00ff00UL | t;
+  case 3:
+    return (q << 8) | 0x0000ffUL;
+  case 4:
+    return (t << 16) | 0x0000ffUL;
+  case 5:
+    return 0xff0000UL | q;
+  }
+  abort();
 }
 
 #endif
