@@ -83,3 +83,4 @@ Support for double floating point precision
 
 - [OpenMP and GPUs](https://www.psc.edu/wp-content/uploads/2021/06/OpenMP-and-GPUs.pdf)
 - [OpenACC Programming Guide](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf)
+- [OpenMP GPUs](https://on-demand.gputechconf.com/gtc/2016/presentation/s6510-jeff-larkin-targeting-gpus-openmp.pdf)

@@ -6,6 +6,7 @@ static const int LIMIT = 1 << 26;
 void add(const int* __restrict__ a, const int* __restrict__ b, int* __restrict__ c) {
   #pragma acc kernels
   {
+    #pragma acc for
     for (int i = 0; i < LIMIT; i++) {
       c[i] = a[i] + b[i];
     }

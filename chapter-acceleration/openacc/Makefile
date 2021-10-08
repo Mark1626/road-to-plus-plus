@@ -1,18 +1,21 @@
-CXXFLAGS=-Wall -Wextra -Ofast
+CXXFLAGS=-Wall -Wextra -O2
 OPENACCFLAG:=-fopenacc
 
-all: vector_add
+NVCXX=nvc++
+NVCXXFLAGS=-mp -target=gpu
+
+all: vector_add_cpu vector_add_gpu
 
 vector_add_cpu: vector_add.cc
 	$(CXX) -o $@ $< $(CXXFLAGS)
 
-vector_add_omp: vector_add.cc
-	$(CXX) -o $@ $< $(CXXFLAGS) -DOMP
-
 vector_add_gpu: vector_add.cc
 	$(CXX) -o $@ $< $(CXXFLAGS) $(OPENACCFLAG)
 
+collide_gpu:
+	$(NVCXX) -o $@ $< $(NVCXXFLAGS)
+
 clean:
-	$(RM) vector_add_cpu vector_add_gpu vector_add_omp
+	$(RM) vector_add_cpu vector_add_gpu collide_gpu
 
 .PHONY: all clean

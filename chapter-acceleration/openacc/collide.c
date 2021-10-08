@@ -1,14 +1,13 @@
-/* 
- * Gist originally by skeeto
- * Modified to distribute workload to GPU
- * https://gist.github.com/skeeto/20d0768222af9e7fe6ec0a2d78726d1a
- * XXTEA block middle collider
+/**
+    Gist from skeeto
+    https://gist.github.com/skeeto/20d0768222af9e7fe6ec0a2d78726d1a
+**/
+/* XXTEA block middle collider
  * Usage: $ cc -s -O3 -march=native -fopenmp collide.c && ./a.out
  */
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-#include <omp.h>
 
 static void
 xxtea128_encrypt(const uint32_t k[4], uint32_t v[4])
@@ -44,9 +43,8 @@ hash32(uint32_t x)
 int
 main(void)
 {
-    printf("Devices: %d\n", omp_get_num_devices());
-    int found = 0;
-    long long n = 1LL<<30;
+    long long c = 0;
+    long long n = 1LL<<36;
     uint32_t seed = hash32(time(0));
     uint32_t k[4] = {
         hash32(seed ^ 1), hash32(seed ^ 2),
@@ -57,32 +55,22 @@ main(void)
     printf("key   = %08lx %08lx %08lx %08lx\n",
            (long)k[0], (long)k[1], (long)k[2], (long)k[3]);
 
-    #pragma omp target data map(to:k)
-    {
-        #pragma omp target
-        #pragma omp teams
-        #pragma omp distribute parallel for
-        for (long long i = 0; i < n; i++) {
-            uint32_t x = hash32(seed ^ (uint32_t)(i>>30));
-            uint32_t b[4] = {
-                x ^ hash32(i*4 + 0), x ^ hash32(i*4 + 1),
-                x ^ hash32(i*4 + 2), x ^ hash32(i*4 + 3),
-            };
-            xxtea128_encrypt(k, b);
-            if (b[1] == b[2]) {
-                #pragma omp critical
-                {
-                    found = 1;
-                    printf("i     = %lld\n", i);
-                    printf("value   = %08lx %08lx %08lx %08lx\n",
-                        (long)b[0], (long)b[1], (long)b[2], (long)b[3]);
-                }
-                #pragma omp cancel for
-            }
-            if (found) {
-                #pragma omp cancel for
+    #pragma omp parallel for
+    for (long long i = 0; i < n; i++) {
+        uint32_t x = hash32(seed ^ (uint32_t)(i>>30));
+        uint32_t b[4] = {
+            x ^ hash32(i*4 + 0), x ^ hash32(i*4 + 1),
+            x ^ hash32(i*4 + 2), x ^ hash32(i*4 + 3),
+        };
+        xxtea128_encrypt(k, b);
+        if (b[1] == b[2]) {
+            #pragma omp critical
+            {
+                c++;
+                printf("i     = %lld\n", i);
             }
         }
     }
 
+    printf("count = %lld\n", c);
 }

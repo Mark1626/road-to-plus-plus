@@ -16,6 +16,9 @@ Case 2 - Case study of cancellation point
 
 Case 3 - xxtea middle block block collider in GPU
 
+
+Interstingly `omp master` is several times faster than `omp single`, look at case study the [other chapter](../chapter-acceleration/openacc/sandpile/README.md)
+
 ## Debugging
 
 - [libgomp DEBUG](https://gcc.gnu.org/onlinedocs/libgomp/GOMP_005fDEBUG.html)
