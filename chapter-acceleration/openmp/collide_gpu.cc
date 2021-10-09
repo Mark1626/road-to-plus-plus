@@ -1,7 +1,10 @@
 /**
     XXTEA block middle collider
     Gist from skeeto modified to target GPUs
+    Check the original out here
     https://gist.github.com/skeeto/20d0768222af9e7fe6ec0a2d78726d1a
+
+    Major learning - Be cautious of the work getting scheduled, unlike OMP in CPU there is no cancel
 **/
 /*
  * Usage: $
@@ -46,7 +49,7 @@ uint32_t hash32(uint32_t x) {
 #pragma omp end declare target
 
 int main(void) {
-  long long n = 1LL << 36;
+  long long n = 1LL << 32;
   uint32_t seed = hash32(time(0));
   uint32_t k[4] = {
       hash32(seed ^ 1),
@@ -58,23 +61,29 @@ int main(void) {
   printf("seed  = %08lx\n", (long)seed);
   printf("key   = %08lx %08lx %08lx %08lx\n", (long)k[0], (long)k[1],
          (long)k[2], (long)k[3]);
+  int found = 0;
 
-  //#pragma acc kernels
-  // #pragma omp target data map(to:k)
+  #pragma omp target map(to : k) map(tofrom : found)
   {
 
-    #pragma omp target teams distribute parallel for map(to : k)
+    #pragma omp teams distribute parallel for
     for (long long i = 0; i < n; i++) {
-      uint32_t x = hash32(seed ^ (uint32_t)(i >> 30));
-      uint32_t b[4] = {
-          x ^ hash32(i * 4 + 0),
-          x ^ hash32(i * 4 + 1),
-          x ^ hash32(i * 4 + 2),
-          x ^ hash32(i * 4 + 3),
-      };
-      xxtea128_encrypt(k, b);
-      if (b[1] == b[2]) {
-        printf("i     = %lld\n", i);
+      if (!found) {
+        uint32_t x = hash32(seed ^ (uint32_t)(i >> 30));
+        uint32_t b[4] = {
+            x ^ hash32(i * 4 + 0),
+            x ^ hash32(i * 4 + 1),
+            x ^ hash32(i * 4 + 2),
+            x ^ hash32(i * 4 + 3),
+        };
+        xxtea128_encrypt(k, b);
+        if (b[1] == b[2]) {
+          #pragma omp critical
+          {
+            found = 1;
+            printf("i     = %lld\n", i);
+          }
+        }
       }
     }
   }

@@ -3,10 +3,10 @@
 
 static const int LIMIT = 1 << 26;
 
-void add(const int* __restrict__ a, const int* __restrict__ b, int* __restrict__ c) {
-  #pragma acc kernels
+void add(int* __restrict__ a, int* __restrict__ b, int* __restrict__ c) {
+  #pragma omp target map(to:a,b) map(tofrom:c)
   {
-    #pragma acc for
+    #pragma omp teams distribute parallel for
     for (int i = 0; i < LIMIT; i++) {
       c[i] = a[i] + b[i];
     }
@@ -22,6 +22,7 @@ int main() {
   for (int i = 0; i < LIMIT; i++) {
     a[i] = i;
     b[i] = LIMIT - i;
+    c[i] = 0;
   }
 
   add(a, b, c);
@@ -33,6 +34,8 @@ int main() {
     // std::cout << c[i] << " ";
     assert(c[i] == LIMIT);
   }
+
+  std::cout << "All elements asserted\n";
 
   delete []c;
 }

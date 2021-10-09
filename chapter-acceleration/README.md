@@ -77,7 +77,13 @@ Support for double floating point precision
 - [GPU Open Libraries and SDKs](https://github.com/GPUOpen-LibrariesAndSDKs)
 - [GPU Open Tools](https://github.com/GPUOpen-Tools)
 
-# OpenACC
+# OpenACC / OpenMP
+
+- reduction - Reduction operation
+- vector_add - Adding two vectors
+- collide - Find partial hash collision in xxtea
+
+Major learning - Be cautious of the work getting scheduled, unlike OMP in CPU there is no cancel
 
 ## References and Reading
 
