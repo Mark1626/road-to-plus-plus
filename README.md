@@ -1,6 +1,6 @@
 # Road to C++ and High Performance Computing
 
-This repo contains things I'm going to try out to learn C++.
+This repo contains things I'm going to try out to learn C++ and High Performance Computing
 
 A lot of these are content I gathered from various places of the internet. Raise an issue if I missed attributing any external content
 
@@ -20,6 +20,7 @@ Below each chapter noting down the things I learnt in the process
   + [3.1](./chapter-3/3.1/)Endian Conversion optimization with `OSByteOrder.h` for Mac, this is converted into `bswap`, checked it by inspecting the generated ASM
   + [3.2](./chapter-3/3.2/)Image Convolution
   + [3.3](./chapter-3/3.3/)Image Histogram Equalization
+  + [3.4](./chapter-3/3.4/) Discrete Fourier Transform
 - [Chapter 4 - Perlin Noise](./chapter-4/)
   + [4.1](./chapter-4/4.1/) Generated Perlin Noise map for a 10^8 points, parallelized it with OpenMP
   + [4.2](./chapter-4/4.2/)OpenMP case studies
@@ -28,17 +29,26 @@ Below each chapter noting down the things I learnt in the process
   + [5.2](./chapter-5/5.2/) Mandelbrot set with OpenMP
   + [5.3](./chapter-5/5.3/) Abelian sandpile model with auto vectorization for non square grids
 - [Chapter Acceleration](./chapter-acceleration/)
-  + **exp-1** Get available device info
-  + **exp-2** Vector addition in kernel
-  + **exp-3** Game of Life
-  + **exp-4** Atomics
-  + **exp-5** Abelian Sandpile(not the best example)
+  + OpenCL
+    - **exp-1** Get available device info
+    - **exp-2** Vector addition in kernel
+    - **exp-3** Game of Life
+    - **exp-4** Atomics
+    - **exp-5** Abelian Sandpile(not the best example)
+  + Cuda
+    - **hello** Hello World with Cuda
+    - **vector_add** Vector addition in device
+  + OpenMP / OpenACC
+    - **collide_gpu** xxtea middle block collision on GPU, based on [this gist](https://gist.github.com/skeeto/20d0768222af9e7fe6ec0a2d78726d1a)
+    - **reduction** reduction operation on GPU
+    - **vector_add** - Adding two vectors
 - [Chapter CMake](./chapter-cmake/)
 - [Chapter Flex Bison](./chapter-flex-bison/)
 - [Chapter Multi Process](./chapter-multi-process/)
 - [Chapter Auto Vectorization](./chapter-auto-vectorization/)
 - [Chapter Profiling](./chapter-profiling/)
 - [Chapter Benchmarks](./chapter-benchmark/)
+- [Chaper CASA](./chapter-casa/)
 
 - Paraphernalia
   + Basic spawning threads with pthread and `<thread>`
@@ -47,7 +57,7 @@ Below each chapter noting down the things I learnt in the process
   + Opening Ini file
 
 
-- Talks
+## Talks
   + [Tuning C++: Benchmarks, and CPUs, and Compilers! Oh My!](https://www.youtube.com/watch?v=nXaxk27zwlk)
   + [LLVM Hybrid Datastructures](https://www.youtube.com/watch?v=vElZc6zSIXM)
   + [std::allocator](https://www.youtube.com/watch?v=LIb3L4vKZ7U)
@@ -77,10 +87,18 @@ Below each chapter noting down the things I learnt in the process
 - Stream Processing
 - Domain Decomposition
 
+## Papers
+
+- [Selected Papers in ACM SIGPLAN 1979-1999](https://www.cs.utexas.edu/users/mckinley/20-years.html)
+- [What Every Computer Scientist Should Know About Floating-Point Arithmetic](http://pages.cs.wisc.edu/~david/courses/cs552/S12/handouts/goldberg-floating-point.pdf)
+- [What Every Programmer Should Know About Memory](https://people.freebsd.org//~lstewart/articles/cpumemory.pdf)
+
 ## Books
 
 - [Introduction to High Performance Scientific Computing](https://pages.tacc.utexas.edu/~eijkhout/istc/html/index.html)
 - [Computer Systems: A Programmer's Perspective]()
+- [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/)
+- [Linux Device Drivers](https://lwn.net/Kernel/LDD3/)
 
 ## Guides
 
@@ -91,12 +109,7 @@ Below each chapter noting down the things I learnt in the process
 
 ## Blogs
 
-- [NullProgram by skeeto](https://nullprogram.com/)
-
-## Rough brainstorm of ideas
-
-- [] Go through [CPP Tutor](https://github.com/banach-space/cpp-tutor)
-- [x] Understand debugging with `lldb`
-- [] Try out `rr`
-- [] Contribute to a OSS project using C++
-- [] Write a toy compiler
+- [NullProgram by skeeto](https://nullprogram.com/) C, C++, Performance, intrinsics
+- [Krister Walfridsson’s blog](https://kristerw.blogspot.com/) LLVM, GCC, Valgrind, nvptx
+- [Fredrik Johansson Blog](https://fredrikj.net/blog/) scientific computing, python
+- [John Burkardt's Blog](https://people.math.sc.edu/Burkardt/) hpc, mpi, openmp

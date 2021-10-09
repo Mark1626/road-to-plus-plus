@@ -22,6 +22,10 @@ perf record -F 100 -g <prog>
 ./valgrind --tool=memcheck --leak-check=full
 ```
 
+## gprof
+
+
+
 ## Experiments
 
 ### Exp-1 perf - Performance Report
@@ -212,6 +216,8 @@ After profiling
 ./sandpile > out.ppm  0.74s user 0.00s system 99% cpu 0.750 total
 ./sandpile > out.ppm  0.73s user 0.00s system 99% cpu 0.739 total
 ```
+
+##
 
 ## Reference
 

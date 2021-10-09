@@ -1,6 +1,7 @@
 /* 
  * Gist originally by skeeto
- * Modified to distribute workload to GPU
+ * Modified to use target construct and stop on finding one collision
+ * Learning omp cancel stops only the current thread
  * https://gist.github.com/skeeto/20d0768222af9e7fe6ec0a2d78726d1a
  * XXTEA block middle collider
  * Usage: $ cc -s -O3 -march=native -fopenmp collide.c && ./a.out

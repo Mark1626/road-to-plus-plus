@@ -14,7 +14,7 @@ Case 2 - Case study of cancellation point
 
 > Note: Cancel only cancels current thread
 
-Case 3 - xxtea middle block block collider in GPU
+Case 3 - xxtea middle block block collider in OpenMP target constructs
 
 
 Interstingly `omp master` is several times faster than `omp single`, look at case study the [other chapter](../chapter-acceleration/openacc/sandpile/README.md)
@@ -40,3 +40,4 @@ Atomic can only be used for `++x;`, `--x;`, `x++;`, `x--;`, `x binop= expr;`, `x
 
 - [OpenMP Cancel](http://jakascorner.com/blog/2016/08/omp-cancel.html)
 - [OpenMP Guide](https://bisqwit.iki.fi/story/howto/openmp/#Abstract)
+- [Using OpenMP for Heterogeneous Systems](https://www.nas.nasa.gov/hecc/assets/pdf/training/OpenMP4.5_3-20-19.pdf)

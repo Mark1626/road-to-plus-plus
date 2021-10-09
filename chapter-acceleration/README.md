@@ -79,11 +79,17 @@ Support for double floating point precision
 
 # OpenACC / OpenMP
 
-- reduction - Reduction operation
-- vector_add - Adding two vectors
-- collide - Find partial hash collision in xxtea
+- **reduction** - Reduction operation
+- **vector_add** - Adding two vectors
+- **collide** - Find partial hash collision in xxtea
 
 Major learning - Be cautious of the work getting scheduled, unlike OMP in CPU there is no cancel
+
+## FAQ
+
+- [GCC Offloading](https://gcc.gnu.org/wiki/Offloading)
+- [Offloading to nvptx](https://gcc.gnu.org/wiki/nvptx)
+- [GCC nvptx target](https://gcc.gnu.org/install/specific.html#nvptx-x-none)
 
 ## References and Reading
 
