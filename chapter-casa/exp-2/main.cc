@@ -17,6 +17,14 @@ int main() {
     }
   }
 
+  std::cout << arr.shape() << std::endl;
+
+  // Or this can be printed like this
+  // for (auto val : arr) {
+  //   std::cout << val << " ";
+  // }
+  // std::cout << std::endl;
+
   for (int i = 0; i < SIZE; ++i) {
     for (int j = 0; j < SIZE; ++j) {
       std::cout << arr(casacore::IPosition(2, i, j)) << " ";
