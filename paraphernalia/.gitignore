@@ -5,3 +5,5 @@ avalanche
 omp
 mpi-test
 read-ini
+serde
+output.txt

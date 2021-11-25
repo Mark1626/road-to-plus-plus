@@ -92,6 +92,7 @@ Below each chapter noting down the things I learnt in the process
 - [Selected Papers in ACM SIGPLAN 1979-1999](https://www.cs.utexas.edu/users/mckinley/20-years.html)
 - [What Every Computer Scientist Should Know About Floating-Point Arithmetic](http://pages.cs.wisc.edu/~david/courses/cs552/S12/handouts/goldberg-floating-point.pdf)
 - [What Every Programmer Should Know About Memory](https://people.freebsd.org//~lstewart/articles/cpumemory.pdf)
+- [Shortlist of Top 10 Algorithms and links to their papers](https://people.math.sc.edu/Burkardt/classes/tta_2015/algorithms.html)
 
 ## Books
 
@@ -99,6 +100,7 @@ Below each chapter noting down the things I learnt in the process
 - [Computer Systems: A Programmer's Perspective]()
 - [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/)
 - [Linux Device Drivers](https://lwn.net/Kernel/LDD3/)
+- [C Unleashed](https://github.com/eliben/c-unleashed-book-souce-code)
 
 ## Guides
 
@@ -106,6 +108,7 @@ Below each chapter noting down the things I learnt in the process
 - [CPP Tutor](https://github.com/banach-space/cpp-tutor)
 - [StreamProcessing Reading List](https://github.com/ShuhaoZhangTony/StreamProcessing_ReadingList)
 - [Domain Decomposition](https://github.com/arielshao/Domain-Decomposition-)
+- [Awesome C++](https://github.com/rigtorp/awesome-modern-cpp)
 
 ## Blogs
 
@@ -113,3 +116,5 @@ Below each chapter noting down the things I learnt in the process
 - [Krister Walfridsson’s blog](https://kristerw.blogspot.com/) LLVM, GCC, Valgrind, nvptx
 - [Fredrik Johansson Blog](https://fredrikj.net/blog/) scientific computing, python
 - [John Burkardt's Blog](https://people.math.sc.edu/Burkardt/) hpc, mpi, openmp
+- [Scott Meyers](https://aristeia.com/)
+

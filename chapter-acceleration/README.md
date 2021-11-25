@@ -69,7 +69,7 @@ Support for double floating point precision
 - [OpenCL Reference](https://www.khronos.org/registry/OpenCL/sdk/2.1/docs/man/xhtml/)
 
 
-# Tools and Resources
+## Tools and Resources
 
 - [AMD ADL SDK](https://gpuopen.com/adl/)
 - [AMD uprof](https://developer.amd.com/amd-uprof/)
@@ -96,3 +96,12 @@ Major learning - Be cautious of the work getting scheduled, unlike OMP in CPU th
 - [OpenMP and GPUs](https://www.psc.edu/wp-content/uploads/2021/06/OpenMP-and-GPUs.pdf)
 - [OpenACC Programming Guide](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf)
 - [OpenMP GPUs](https://on-demand.gputechconf.com/gtc/2016/presentation/s6510-jeff-larkin-targeting-gpus-openmp.pdf)
+- [GPU Bootcamp](https://github.com/gpuhackathons-org/gpubootcamp)
+- [Cuda Streams in LLVM](https://www.openmp.org/wp-content/uploads/2021_03_26_Leveraging_Implicit_CUDA_Streams_and_Asynchronous_OpenMP_offload_Features_in_LLVM.pdf)
+
+# Cuda
+
+## References and Reading
+
+- [Cuda Streams](https://on-demand.gputechconf.com/gtc/2014/presentations/S4158-cuda-streams-best-practices-common-pitfalls.pdf)
+
