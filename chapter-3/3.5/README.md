@@ -7,6 +7,23 @@ c++ -o tbench tbench.cc `pkg-config --libs liblog4cxx benchmark`
 
 ```
 
+## Case Studies
+
+### Microsoft
+
+- [Delivering 45x faster percentiles using Postgres, Citus, & t-digest](https://techcommunity.microsoft.com/t5/azure-database-for-postgresql/diary-of-an-engineer-delivering-45x-faster-percentiles-using/ba-p/1685102)
+
+**Notes:**
+  - Use case highlights t-digest used in a system with 100TB with 10TB/hr data ingestion
+
+### Elasticsearch
+
+[elasticsearch tdigest Median Absolute Deviation](https://github.com/elastic/elasticsearch/blob/fd185e4661ee61a99eeefe94d781839893c8bba2/server/src/main/java/org/elasticsearch/search/aggregations/metrics/InternalMedianAbsoluteDeviation.java#L30-L36)
+
+**Notes:**
+  - Data ingested once is used for median and MADFM
+
+
 ## Benchmark result
 
 ```
