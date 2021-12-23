@@ -1,8 +1,13 @@
+#pragma once
 #include <cstdlib>
 #include <fstream>
+#include <initializer_list>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
+#include <vector>
 #include <string>
+#include <utility>
 
 namespace cxxplot {
 class CXXPlot {
@@ -20,7 +25,7 @@ public:
     file << "set terminal png size 400,300 enhanced\n";
     file << "set output '" << png_name << "'\n";
   }
-  void script(std::string command) { file << command; }
+  void script(std::string command) { file << command << "\n"; }
   void export_png() {
     file << "replot\n";
     file << "set terminal pop\n";
@@ -33,5 +38,24 @@ public:
     }
   }
 };
+
+template<typename T>
+void plot(std::string plotname, std::vector<std::pair<T, T>> data, std::initializer_list<std::string> extras = {}) {
+    CXXPlot plot("script.ps", plotname);
+
+    for (auto extra : extras)
+      plot.script(extra);
+
+
+    // Plot the points
+    std::ostringstream ss;
+    ss << "plot '-' notitle\n";
+    for (auto point : data) {
+      ss << point.first << " " << point.second << "\n";
+    }
+    plot.script(ss.str());
+
+    plot.export_png();
+}
 
 } // namespace cxxplot

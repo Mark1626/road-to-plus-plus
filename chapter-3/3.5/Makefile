@@ -2,20 +2,20 @@
 
 MPICXX=mpic++
 
-CXXFLAGS=-Wall -Wextra -O3 -fopenmp -lboost_serialization -lboost_mpi -std=c++14
-PKG_CONFIG=`pkg-config --libs benchmark liblog4cxx cppunit`
+CXXFLAGS=-Wall -Wextra -O3 -fopenmp -lboost_serialization -lboost_mpi -std=c++14 -lbenchmark
+PKG_CONFIG=`pkg-config --libs benchmark cppunit liblog4cxx`
 
 all: tbench test_tdigest texample
 
 SHAREDFLAGS=-fPIC -shared -Wl,-soname,libtdigest.so -I .
 
 libtdigest.so: TDigest.cc TDigest.hh
-	$(CXX) $(CXXFLAGS) $(PKG_CONFIG) $(SHAREDFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(PKG_CONFIG) $(SHAREDFLAGS)
 
 TDigest.o: TDigest.hh
 
-%: %.cc TDigest.o
-	$(CXX) $(CXXFLAGS) $(PKG_CONFIG) -o $@ $^
+%: %.cc TDigest.hh
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(PKG_CONFIG)
 
 clean:
 	rm tbench texample test_tdigest

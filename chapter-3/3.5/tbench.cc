@@ -1,8 +1,6 @@
 #include "TDigest.hh"
 #include <algorithm>
 #include <benchmark/benchmark.h>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
 #include <fstream>
 #include <omp.h>
 #include <vector>
@@ -17,23 +15,16 @@ const int COMP_END = 1 << 7;
 const int THREADS_START = 12;
 const int THREADS_END = 16;
 
-std::vector<double> deserialize(int N, std::string filename = "data.dat") {
-  std::vector<double> restore_values;
-  std::ifstream ifs(filename);
+using namespace tdigest;
 
-  if (ifs.is_open()) {
-    boost::archive::text_iarchive ia(ifs);
-
-    for (int i = 0; i < N; i++) {
-      double value;
-      ia >> value;
-      restore_values.push_back(value);
-    }
-  } else {
-    throw std::runtime_error("Unable to open file");
+std::vector<double> deserialize(int N) {
+  double a = 5.0;
+  std::vector<double> values;
+  for (int i = 0; i < N; i++) {
+    auto val = (double)std::rand() / (double)(RAND_MAX / a);
+    values.push_back(val);
   }
-
-  return restore_values;
+  return values;
 }
 
 static double quantile(const double q, const std::vector<double> &values) {
@@ -111,7 +102,7 @@ static void Benchmark_Tdigest_Quantile(benchmark::State &state) {
   const int N = state.range(0);
   const double compression = state.range(1);
 
-  TDigest digest(compression);
+  TDigest<double> digest(compression);
 
   std::vector<double> values = deserialize(N);
 
@@ -129,7 +120,7 @@ static void Benchmark_Parallel_Tdigest_Quantile(benchmark::State &state) {
   const int N = state.range(0);
   const double compression = state.range(1);
 
-  TDigest digest(compression);
+  TDigest<double> digest(compression);
 
   std::vector<double> values = deserialize(N);
 
@@ -141,7 +132,7 @@ static void Benchmark_Parallel_Tdigest_Quantile(benchmark::State &state) {
 
 #pragma omp parallel for num_threads(threads)
     for (int section = 0; section < n_sections; section++) {
-      TDigest local_digest(compression);
+      TDigest<double> local_digest(compression);
 
       for (int i = 0; i < section_width; i++) {
         int idx = (section * section_width) + i;
@@ -149,7 +140,7 @@ static void Benchmark_Parallel_Tdigest_Quantile(benchmark::State &state) {
       }
 
 #pragma omp critical
-      { digest.merge(&local_digest); }
+      { digest.add(local_digest); }
     }
     // digest.add(local_digests.begin(), local_digests.end());
     // digest.compress();
@@ -157,15 +148,7 @@ static void Benchmark_Parallel_Tdigest_Quantile(benchmark::State &state) {
     auto median = digest.quantile(0.5);
 
     auto digest_median = digest.quantile(0.5);
-    TDigest dfm_digest(compression);
-
-    for (auto centroid : digest.processed) {
-      double deviation = digest_median - centroid.mean();
-      deviation = deviation < 0 ? -deviation : deviation;
-      dfm_digest.add(deviation);
-    }
-
-    auto digest_madfm = dfm_digest.quantile(0.5);
+    auto digest_madfm = digest.madfm();
 
     benchmark::DoNotOptimize(median);
     benchmark::DoNotOptimize(digest_madfm);

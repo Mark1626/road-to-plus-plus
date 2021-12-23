@@ -105,10 +105,13 @@ Below each chapter noting down the things I learnt in the process
 ## Guides
 
 - [OpenMP Guide](https://bisqwit.iki.fi/story/howto/openmp/#Abstract)
+- [OpenMP Examples](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
+- [OpenMP 4.0 - 4.5](https://asc.llnl.gov/sites/asc/files/2020-09/2-24_scogland.pdf)
 - [CPP Tutor](https://github.com/banach-space/cpp-tutor)
 - [StreamProcessing Reading List](https://github.com/ShuhaoZhangTony/StreamProcessing_ReadingList)
 - [Domain Decomposition](https://github.com/arielshao/Domain-Decomposition-)
 - [Awesome C++](https://github.com/rigtorp/awesome-modern-cpp)
+- [Advanced OpenMP](https://openmpcon.org/wp-content/uploads/openmpcon2017/Tutorial2-Advanced_OpenMP.pdf)
 
 ## Blogs
 
