@@ -64,89 +64,106 @@ struct Param {
     Param(float reconSNR) : reconSNR(reconSNR) {}
 };
 
-// #pragma omp declare target
+#pragma omp declare target
+inline void swap(float &a, float &b) {
+  float temp = a;
+  a = b;
+  b = temp;
+}
+
+float qselect(float *arr, int len, int nth) {
+  int start = 0;
+  for (int index = 0; index < len - 1; index++) {
+    if (arr[index] > arr[len - 1])
+      continue;
+    swap(arr[index], arr[start]);
+    start++;
+  }
+  swap(arr[len - 1], arr[start]);
+
+  if (nth == start)
+    return arr[start];
+
+  return start > nth ? qselect(arr, start, nth)
+                     : qselect(arr + start, len - start, nth - start);
+}
+#pragma omp end declare target
+
+#pragma omp declare target
 float findMedian(float* input, size_t xdim) {
     float median;
 
-    float* arr = new float[xdim];
+    float* arr = (float*) malloc(sizeof(float) * xdim);
     for (int i = 0; i < xdim; i++)
         arr[i] = input[i];
 
-    std::nth_element(arr, arr + xdim / 2, arr + xdim);
-    median = arr[xdim / 2];
+    median = qselect(arr, xdim, xdim/2);
     if (xdim % 2 == 0) {
-        std::nth_element(arr, arr + xdim / 2 - 1, arr + xdim);
-        median += arr[xdim / 2 - 1];
+        median += qselect(arr, xdim, xdim/2 - 1);
         median /= 2;
     }
-    delete[] arr;
+    free(arr);
     return median;
 }
-// #pragma omp end declare target
+#pragma omp end declare target
 
-// #pragma omp declare target
+#pragma omp declare target
 float findMadfm(float* input, size_t xdim) {
     float median = findMedian(input, xdim);
 
-    float* arr = new float[xdim];
+    float* arr = (float*) malloc(sizeof(float) * xdim);
     for (int i = 0; i < xdim; i++) {
         float val = input[i] - median;
         arr[i] = val < 0 ? -val : val;
     }
 
-    std::nth_element(arr, arr + xdim / 2, arr + xdim);
-    median = arr[xdim / 2];
+    median = qselect(arr, xdim, xdim/2);
     if (xdim % 2 == 0) {
-        std::nth_element(arr, arr + xdim / 2 - 1, arr + xdim);
-        median += arr[xdim / 2 - 1];
+        median += qselect(arr, xdim, xdim/2 - 1);
         median /= 2;
     }
-    delete[] arr;
+    free(arr);
     return median;
 }
-// #pragma omp end declare target
+#pragma omp end declare target
 
-// #pragma omp declare target
+#pragma omp declare target
 float findMedianDiff(float* first, float *second, size_t xdim) {
     float median;
 
-    float* arr = new float[xdim];
+    float* arr = (float*) malloc(sizeof(float) * xdim);
     for (int i = 0; i < xdim; i++)
         arr[i] = first[i] - second[i];
 
-    std::nth_element(arr, arr + xdim / 2, arr + xdim);
-    median = arr[xdim / 2];
+    median = qselect(arr, xdim, xdim/2);
     if (xdim % 2 == 0) {
-        std::nth_element(arr, arr + xdim / 2 - 1, arr + xdim);
-        median += arr[xdim / 2 - 1];
+        median += qselect(arr, xdim, xdim/2 - 1);
         median /= 2;
     }
-    delete[] arr;
+    free(arr);
     return median;
 }
-// #pragma omp end declare target
+#pragma omp end declare target
 
-// #pragma omp declare target
+#pragma omp declare target
 float findMadfmDiff(float* first, float* second, size_t xdim) {
     float median = findMedianDiff(first, second, xdim);
 
-    float* arr = new float[xdim];
+    float* arr = (float*) malloc(sizeof(float) * xdim);
     for (int i = 0; i < xdim; i++) {
         float val = first[i] - second[i] - median;
         arr[i] = val < 0 ? -val : val;
     }
 
-    std::nth_element(arr, arr + xdim / 2, arr + xdim);
-    median = arr[xdim / 2];
+    median = qselect(arr, xdim, xdim/2);
     if (xdim % 2 == 0) {
-        std::nth_element(arr, arr + xdim / 2 - 1, arr + xdim);
-        median += arr[xdim / 2 - 1];
+        median += qselect(arr, xdim, xdim/2 - 1);
         median /= 2;
     }
-    delete[] arr;
+    free(arr);
     return median;
 }
-// #pragma omp end declare target
+#pragma omp end declare target
 
 // This should be given to cores
 void atrousRecon(size_t &xdim, float *input, float* output, Param &par) {
@@ -157,21 +174,20 @@ void atrousRecon(size_t &xdim, float *input, float* output, Param &par) {
     HaarWavelet haar;
     int numScales = haar.getNumScales(xdim);
 
-    double *sigmafactors = new double[numScales + 1];
+    double *sigmafactors = (double*) malloc(sizeof(double) * (numScales + 1));
     for (int i = 0; i < numScales; i++) {
         sigmafactors[i] = haar.sigmaFactor(i);
     }
 
     float mean, originalSigma, oldSigma, newSigma;
 
-    float *signal = new float[xdim];
-
+    float *signal = (float*) malloc(sizeof(float) * xdim);
 
     for (int pos = 0; pos < xdim; pos++)
         output[pos] = 0;
 
     int filterW = haar.width() / 2;
-    double *filter = new double[haar.width()];
+    double *filter = (double*) malloc(sizeof(double) * haar.width());
     for (int i = 0; i < haar.width(); i++) {
         filter[i] = haar.coeff(i);
     }
@@ -191,7 +207,7 @@ void atrousRecon(size_t &xdim, float *input, float* output, Param &par) {
         // This should be given to threads
         for (unsigned int scale = 1; scale <= numScales; scale++) {
 
-            float *wavelet = new float[xdim];
+            float *wavelet = (float*) malloc(sizeof(float) * xdim);
             for (size_t xpos = 0; xpos < xdim; xpos++) {
                 wavelet[xpos] = signal[xpos];
 
@@ -225,7 +241,7 @@ void atrousRecon(size_t &xdim, float *input, float* output, Param &par) {
             }
 
             spacing *= 2;
-            delete[] wavelet;
+            free(wavelet);
         }
 
         // for (int pos = 0; pos < xdim; pos++) {
@@ -234,11 +250,15 @@ void atrousRecon(size_t &xdim, float *input, float* output, Param &par) {
 
         newSigma = findMadfmDiff(input, output, xdim);
     }
+
+    free(filter);
+    free(signal);
+    free(sigmafactors);
 }
 
 int main() {
     int N = 10000;
-    float *arr = new float[N];
+    float *arr = (float*) malloc(sizeof(float) * N);
     float a = 5.0;
 
     srand(10);
@@ -246,6 +266,8 @@ int main() {
         auto val = (float)std::rand() / (float)(RAND_MAX / a);
         arr[i] = val;
     }
+
+    free(arr);
 
     return  0;
 }

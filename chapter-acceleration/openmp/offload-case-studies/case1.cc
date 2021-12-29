@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-void test_sum_int(size_t N) {
+void test_sum_int(int N) {
   float *arr = new float[N];
   for (int i = 0; i < N; i++) {
     arr[i] = i;
@@ -35,7 +35,7 @@ void test_sum_int(size_t N) {
   delete[] arr;
 }
 
-void test_sum_float(size_t N) {
+void test_sum_float(int N) {
   float *arr = new float[N];
   float a = 5.0;
 

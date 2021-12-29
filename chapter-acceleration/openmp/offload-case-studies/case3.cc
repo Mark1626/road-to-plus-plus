@@ -5,7 +5,7 @@
   new, delete cannot be used within function declared for target
 */
 #pragma omp declare target
-float offload_allocate(size_t xdim) {
+float offload_allocate(int xdim) {
   float arr[xdim];
   float sum = 0.0;
 
@@ -29,7 +29,7 @@ void test_offload_allocate(int N) {
 }
 
 #pragma omp declare target
-float offload_allocate_malloc(size_t xdim) {
+float offload_allocate_malloc(int xdim) {
   float *arr = (float*) malloc((sizeof(float)*xdim));
   float sum = 0.0;
 
