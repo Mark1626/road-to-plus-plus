@@ -2,5 +2,8 @@
 
 int main() {
   int *arr = new int[10];
-  std::cout << "Testing memory leak";
+
+  delete[] arr;
+
+  std::cout << "Testing memory leak " << arr[1];
 }

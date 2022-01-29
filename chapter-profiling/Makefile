@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -Wextra -O3 -g -fno-omit-frame-pointer -fopenmp
+CXXFLAGS=-Wall -Wextra -O3 -g -fno-omit-frame-pointer -fopenmp -fsanitize=address
 
 .ONESHELL=
 

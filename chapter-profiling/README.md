@@ -22,6 +22,14 @@ perf record -F 100 -g <prog>
 ./valgrind --tool=memcheck --leak-check=full
 ```
 
+## Compiler Options
+
+### -fsanitize=address
+
+GCC and Clang have `fsanitize` which can detect leaks
+
+Specify `ASAN_OPTIONS=detect_leaks=1` before running the executable.
+
 ## gprof
 
 
@@ -35,7 +43,7 @@ perf record -g -F 100 ./sandpile > test.ppm
 perf report -g 'graph,0.5,caller'
 ```
 
-### Exp-2 memcheck - Checking for leaks
+### Exp-2.1 memcheck - Checking for leaks
 
 ```
 ./valgrind --tool=memcheck --leak-check=full ./exp-2
@@ -67,6 +75,23 @@ Testing memory leak==22==
 ==22==
 ==22== For counts of detected and suppressed errors, rerun with: -v
 ==22== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+```
+
+### Exp-2.2 -fsanitize=address
+
+```
+g++ -o leak leak.cc -g -fsanitize=address
+
+ASAN_OPTIONS=detect_leaks=1 ./leak
+=================================================================
+==45065==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x10c5d7677 in wrap__Znam+0xa7 (libasan.6.dylib:x86_64+0x4e677)
+    #1 0x10c200cc6 in main leak.cc:4
+    #2 0x7fff203f9f3c in start+0x0 (libdyld.dylib:x86_64+0x15f3c)
+
+SUMMARY: AddressSanitizer: 40 byte(s) leaked in 1 allocation(s).
 ```
 
 ### Exp-3 callgrind - Call graph cache profiler
