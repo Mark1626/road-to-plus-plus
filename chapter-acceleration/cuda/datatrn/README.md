@@ -7,3 +7,5 @@
 - exp-6: Shared memory for storing window in kernel then process it
 - exp-7: Statically allocating a large array in a kernel
 - exp-8: Sliding window median with static memory allocation
+
+https://ppl.stanford.edu/papers/sc11-bauer.pdf

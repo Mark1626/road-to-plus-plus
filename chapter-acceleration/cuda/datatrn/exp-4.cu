@@ -24,7 +24,7 @@
 __global__ void alloc_test(const float *in, float *out, int xlimit, int ylimit,
                            int bxlen, int bylen) {
   unsigned int ystride = blockDim.y * gridDim.y;
-  unsigned int xstride = blockDim.x * blockDim.x;
+  unsigned int xstride = blockDim.x * gridDim.x;
 
   float *tmp = (float *)malloc(sizeof(float) * bxlen * bylen);
 

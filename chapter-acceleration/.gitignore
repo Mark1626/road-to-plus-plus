@@ -10,3 +10,6 @@ cl_info
 atomic
 sandpile
 *.dSYM
+out.txt
+compile_flags.txt
+

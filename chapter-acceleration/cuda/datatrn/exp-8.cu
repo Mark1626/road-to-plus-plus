@@ -126,7 +126,7 @@ __global__ void gliding_window(const float *arr, const bool *mask, float *res1,
   float tmp[bxlen * bylen];
   // float tmp[bxlen * bylen];
   unsigned int ystride = blockDim.y * gridDim.y;
-  unsigned int xstride = blockDim.x * blockDim.x;
+  unsigned int xstride = blockDim.x * gridDim.x;
   // printf("xstride: %d ystride: %d\n", xstride, ystride);
 
   for (unsigned int y = blockIdx.y * blockDim.y + threadIdx.y; y < ylimit;
@@ -268,7 +268,7 @@ void gpu_sliding_window(const float *arr, const bool *mask, float *res1,
 }
 
 void experiment(int SIZE, int blockxsz, int blockysz, int gridxsz,
-                int gridysz) {
+                int gridysz, float threshold) {
   int shape[NDIM] = {SIZE, SIZE};
   int resShape[NDIM] = {shape[0] - bxlen, shape[1] - bylen};
 
@@ -283,13 +283,18 @@ void experiment(int SIZE, int blockxsz, int blockysz, int gridxsz,
 
   double a = 5.0;
 
+  int filtered = 0;
   for (int y = 0; y < shape[1]; y++) {
     for (int x = 0; x < shape[0]; x++) {
       float val = (double)std::rand() / (double)(RAND_MAX / a);
       arr[y * shape[0] + x] = val;
-      mask[y * shape[0] + x] = val > 1.0;
+      if (val > threshold) {
+        mask[y * shape[0] + x] = true;
+        filtered++;
+      }
     }
   }
+  printf("Filtered %d of %d values\n", filtered, shape[0]*shape[1]);
 
 #ifdef DEBUG
   printf("Data\n");
@@ -459,9 +464,9 @@ void experiment(int SIZE, int blockxsz, int blockysz, int gridxsz,
 }
 
 int main(int argc, char **argv) {
-  if (argc < 6) {
+  if (argc < 7) {
     fprintf(stderr,
-            "Usage:\n exp-8 <SIZE> <blockx> <blocky> <gridx> <gridy>\n");
+            "Usage:\n exp-8 <SIZE> <blockx> <blocky> <gridx> <gridy> <threshold>\n");
     return 1;
   }
   int SIZE = std::atoi(argv[1]);
@@ -469,6 +474,7 @@ int main(int argc, char **argv) {
   int blockysz = std::atoi(argv[3]);
   int gridxsz = std::atoi(argv[4]);
   int gridysz = std::atoi(argv[5]);
+  float threshold = std::atof(argv[6]);
 
-  experiment(SIZE, blockxsz, blockysz, gridxsz, gridysz);
+  experiment(SIZE, blockxsz, blockysz, gridxsz, gridysz, threshold);
 }

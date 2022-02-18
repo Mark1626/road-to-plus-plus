@@ -121,7 +121,7 @@ gliding_window(const float *arr, const bool *mask, float *res1, float *res2,
   float *tmp = (float *)malloc(sizeof(float) * bxlen * bylen);
   // float tmp[bxlen * bylen];
   unsigned int ystride = blockDim.y * gridDim.y;
-  unsigned int xstride = blockDim.x * blockDim.x;
+  unsigned int xstride = blockDim.x * gridDim.x;
   // printf("xstride: %d ystride: %d\n", xstride, ystride);
 
   for (unsigned int y = blockIdx.y * blockDim.y + threadIdx.y; y < ylimit;

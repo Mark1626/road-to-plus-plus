@@ -44,7 +44,7 @@ __device__ __host__ float qselect(float *arr, int len, int nth) {
 
 __global__ void qselect_kernel(const float *in, float *out, int N, int limit,
                                int blen) {
-  unsigned int xstride = blockDim.x * blockDim.x;
+  unsigned int xstride = blockDim.x * gridDim.x;
 
   float *tmp = (float *)malloc(sizeof(float) * blen);
 
@@ -82,7 +82,7 @@ __global__ void qselect_kernel(const float *in, float *out, int N, int limit,
 
 __global__ void select_kernel(const float *in, float *out, int N, int limit,
                               int blen) {
-  unsigned int xstride = blockDim.x * blockDim.x;
+  unsigned int xstride = blockDim.x * gridDim.x;
 
   float *tmp = (float *)malloc(sizeof(float) * blen);
 
