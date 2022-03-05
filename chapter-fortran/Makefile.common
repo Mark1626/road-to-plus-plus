@@ -1,0 +1,8 @@
+F90 = gfortran
+CF90 = pgfortran
+
+%: %.f90
+	$(F90) -o $@ $^ -O3
+
+%: %.cuf
+	$(CF90) -o $@ $^ -O3
