@@ -7,3 +7,5 @@ reduction_cpu
 reduction_gpu
 vector_add_cpu
 vector_add_gpu
+atrous-wavelet-recon
+offload-case-studies/offload-case-studies

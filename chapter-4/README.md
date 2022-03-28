@@ -16,6 +16,8 @@ Case 2 - Case study of cancellation point
 
 Case 3 - xxtea middle block block collider in OpenMP target constructs
 
+Case 4 - Conditional and Nested OpenMP usage. Nested thread spawning has to be enabled with `omp_set_nested(1)`, control on how many threads to spawn can be done with `OMP_NUM_THREADS=2,8`
+
 
 Interstingly `omp master` is several times faster than `omp single`, look at case study the [other chapter](../chapter-acceleration/openacc/sandpile/README.md)
 

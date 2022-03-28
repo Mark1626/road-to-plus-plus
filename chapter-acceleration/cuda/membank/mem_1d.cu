@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
   }
 
   size_t limit = len - boxsz;
-  size_t size = (sizeof(float) * 32 * boxsz) * ((limit / boxsz) + 1);
+  size_t size = (sizeof(float) * 32 * 8 * boxsz);
 
   printf("dimension: %d blocksz: %d allocating %lu \n", len, boxsz, size);
 
@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
     in[i] = (len - i) * 1.0;
   }
 
-  mem_bank_1d_kernel<<<1, 64, size>>>(in, out, len, limit, boxsz);
+  mem_bank_1d_kernel<<<1, 256, size>>>(in, out, len, limit, boxsz);
 
   cudaDeviceSynchronize();
 

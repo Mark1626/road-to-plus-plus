@@ -5,11 +5,14 @@
 #include <casacore/coordinates/Coordinates/Coordinate.h>
 #include <casacore/coordinates/Coordinates/CoordinateSystem.h>
 #include <casacore/coordinates/Coordinates/DirectionCoordinate.h>
+#include <casacore/coordinates/Coordinates/SpectralCoordinate.h>
+#include <casacore/coordinates/Coordinates/StokesCoordinate.h>
 #include <casacore/fits/FITS/FITSDateUtil.h>
 #include <casacore/fits/FITS/FITSKeywordUtil.h>
 #include <casacore/fits/FITS/FITSReader.h>
 #include <casacore/fits/FITS/fits.h>
 #include <casacore/measures/Measures/MDirection.h>
+#include <casacore/measures/Measures/MFrequency.h>
 #include <fitsio.h>
 #include <fstream>
 #include <longnam.h>
@@ -230,10 +233,10 @@ public:
 };
 
 int main() {
-
   std::string name = "dummy.fits";
   int xsize = 128;
   int ysize = 128;
+  int nchan = 48;
 
   casa::IPosition shape(2, xsize, ysize);
   casa::CoordinateSystem wcs;
@@ -246,6 +249,7 @@ int main() {
   xform = 0.0;
   xform.diagonal() = 1.0;
 
+  // RA-Dec Axis
   casa::DirectionCoordinate direction(
       casa::MDirection::J2000, casa::Projection(casa::Projection::SIN),
       294 * casa::C::pi / 180.0, -60 * casa::C::pi / 180,
@@ -256,8 +260,27 @@ int main() {
   units = "deg";
   direction.setWorldAxisUnits(units);
 
-  wcs.addCoordinate(direction);
+  // Spectral Axis
+  casa::SpectralCoordinate spectral(casa::MFrequency::TOPO, 1400E+6, 20E+3, 0,
+                                    1420.40575E+6);
 
+  units.resize(1);
+  units = "MHz";
+  spectral.setWorldAxisUnits(units);
+
+  // Polarisaiton Axis
+  const casacore::Vector<casacore::Stokes::StokesTypes> stokesVec = std::vector<casacore::Stokes::StokesTypes>(1, casacore::Stokes::type("I"));
+
+
+  wcs.addCoordinate(direction);
+  wcs.addCoordinate(spectral);
+  shape.append(casa::IPosition(1, nchan));
+
+  casacore::StokesCoordinate stokes(std::vector<int>(1, 1));
+  wcs.addCoordinate(stokes);
+
+
+  // Pixels
   casa::Matrix<casa::Float> pixels(xsize, ysize);
   pixels = 0.0;
   pixels.diagonal() = 0.001;
