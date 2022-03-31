@@ -35,6 +35,7 @@ void dotprod(complex2<float>& c, complex2<float> &a, complex2<float> &b) {
   float *a_raw = reinterpret_cast<float(&)[4]>(a);
   // rb1 ib1 rb2 ib2
   float *b_raw = reinterpret_cast<float(&)[4]>(b);
+  float *c_raw = reinterpret_cast<float(&)[4]>(c);
   float res_raw[4];
 
   __m128 a_vec = _mm_load_ps(a_raw);
@@ -74,9 +75,9 @@ void dotprod(complex2<float>& c, complex2<float> &a, complex2<float> &b) {
 
   __m128 res_vec = _mm_add_ps(interm3, interm4);
 
-  _mm_store_ps(res_raw, res_vec);
+  _mm_store_ps(c_raw, res_vec);
 
-  c = reinterpret_cast<complex2<float>(&)>(res_raw);
+  // c = reinterpret_cast<complex2<float>(&)>(res_raw);
 }
 } // namespace simd
 

@@ -18,8 +18,8 @@ void dotprod(complex4<float> &c, complex4<float> &a, complex4<float> &b) {
   float *b_raw = reinterpret_cast<float(&)[8]>(b);
   float res_raw[8];
 
-  __m256 a_vec = _mm256_load_ps(a_raw);
-  __m256 b_vec = _mm256_load_ps(b_raw);
+  __m256 a_vec = _mm256_loadu_ps(a_raw);
+  __m256 b_vec = _mm256_loadu_ps(b_raw);
 
   // ra1rb1 ia1ib1 ra2ia2 ia2ib2 ra3rb3 ia3ib3 ra4ia4 ia4ib4
   __m256 interm1 = _mm256_mul_ps(a_vec, b_vec);
@@ -55,9 +55,10 @@ void dotprod(complex4<float> &c, complex4<float> &a, complex4<float> &b) {
 
   __m256 res_vec = _mm256_add_ps(interm3, interm4);
 
-  _mm256_store_ps(res_raw, res_vec);
+  _mm256_storeu_ps(res_raw, res_vec);
 
-  c = reinterpret_cast<complex4<float>(&)>(res_raw);
+  // This is not needed
+  // c = reinterpret_cast<complex4<float>(&)>(res_raw);
 }
 } // namespace simd
 
