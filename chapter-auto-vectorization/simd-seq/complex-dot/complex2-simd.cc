@@ -6,18 +6,16 @@
 namespace simd {
 template <typename T> struct complex2 { std::complex<T> d[2]; };
 
-template <> struct complex2<float> { _Alignas(16) std::complex<float> d[2]; };
+template <> struct complex2<float> { alignas(16) std::complex<float> d[2]; };
 
 #define MASK(a, b, c, d) ((a << 6) + (b << 4) + (c << 2) + d)
 
-void dotprod(complex2<float> &c, complex2<float> &a, complex2<float> &b) {
+void prod(complex2<float> &c, complex2<float> &a, complex2<float> &b) {
   // ra1 ia1 ra2 ia2
   float *a_raw = reinterpret_cast<float(&)[4]>(a);
   // rb1 ib1 rb2 ib2
   float *b_raw = reinterpret_cast<float(&)[4]>(b);
   float *c_raw = reinterpret_cast<float(&)[4]>(c);
-
-  float res_raw[4];
 
   __m128 a_vec = _mm_load_ps(a_raw);
   __m128 b_vec = _mm_load_ps(b_raw);
@@ -28,19 +26,11 @@ void dotprod(complex2<float> &c, complex2<float> &a, complex2<float> &b) {
   const float sign[4] = {-1.0, 1.0, -1.0, 1.0};
   const int sample1 = 0b0101;
   const int sample2 = 0b1010;
-  // TODO: Check endianness
   const int swap_mask = MASK(2, 3, 0, 1);
 
-  __m128 twist1 = _mm_blend_ps(a_vec, b_vec, sample1);
-  __m128 twist2 = _mm_blend_ps(a_vec, b_vec, sample2);
-
-  twist1 = _mm_permute_ps(twist1, swap_mask);
-
-  // ra1ia1 ra2ia2 rb1ib1 rb2ib2
-  __m128 interm2 = _mm_mul_ps(twist1, twist2);
-
-  // ra1rb1 ia1ib1 ra2ia2 ia2ib2
-  // ra1ia1 ra2ia2 rb1ib1 rb2ib2
+  __m128 twist1 = _mm_permute_ps(b_vec, swap_mask);
+  // ra1ia2 ra2ia1 rb1ib2 rb2ib1
+  __m128 interm2 = _mm_mul_ps(a_vec, twist1);
 
   // ra1ia1 ia1ib1 rb1ib1 ia2ib2
   __m128 interm3 = _mm_blend_ps(interm1, interm2, sample1);
@@ -57,8 +47,6 @@ void dotprod(complex2<float> &c, complex2<float> &a, complex2<float> &b) {
   __m128 res_vec = _mm_add_ps(interm3, interm4);
 
   _mm_store_ps(c_raw, res_vec);
-
-  // c = reinterpret_cast<complex2<float>(&)>(res_raw);
 }
 } // namespace simd
 
@@ -71,7 +59,7 @@ inline void dotprod_simd_stdcomplex_to_stdcomplex(
   simd::complex2<float> *c_vec = reinterpret_cast<simd::complex2<float> *>(cArr);
 
   for (int i = 0; i < N/2; i++) {
-    simd::dotprod(c_vec[i], a_vec[i], b_vec[i]);
+    simd::prod(c_vec[i], a_vec[i], b_vec[i]);
   }
 }
 

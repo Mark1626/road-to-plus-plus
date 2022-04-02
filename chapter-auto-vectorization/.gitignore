@@ -4,3 +4,13 @@ exp-1-sandpile
 mandel-mini.cc
 sandpile-mini.cc
 sandpile-compact.cc
+
+grid/base
+grid/grid
+grid/grid-old
+grid/poc
+
+simd-seq/complex-dot/complex-dot
+simd-seq/grid/base
+simd-seq/grid/grid
+simd-seq/grid/poc
