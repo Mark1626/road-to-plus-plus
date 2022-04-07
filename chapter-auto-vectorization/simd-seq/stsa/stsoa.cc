@@ -11,6 +11,11 @@
 #include <xmmintrin.h>
 
 // #define DEBUG
+bool assert = false;
+bool avx_gridding = true;
+bool sse_gridding = true;
+bool ptr_gridding = true;
+bool std_gridding = true;
 
 typedef std::complex<float> CFloat;
 
@@ -67,6 +72,27 @@ void gridding_casa_std(casacore::Matrix<casacore::Complex> &grid,
       const int uoff = suppu + support;
       casacore::Complex wt = convFunc(uoff, voff);
       grid(iu + suppu, iv + suppv) += cVis * wt;
+    }
+  }
+}
+
+void gridding_casa_ptr(casacore::Matrix<casacore::Complex> &grid,
+                       casacore::Matrix<casacore::Complex> &conv,
+                       const casacore::Complex &cVis, const int iu,
+                       const int iv, const int support) {
+
+  float rVis = cVis.real();
+  float iVis = cVis.imag();
+  for (int suppv = -support; suppv <= support; suppv++) {
+    const int voff = suppv + support;
+    const int uoff = 0;
+    float *wtPtrF = reinterpret_cast<float *>(&conv(uoff, voff));
+    float *gridPtrF =
+        reinterpret_cast<float *>(&grid(iu - support, iv + suppv));
+    for (int suppu = -support; suppu <= support;
+         suppu++, wtPtrF += 2, gridPtrF += 2) {
+      gridPtrF[0] += rVis * wtPtrF[0] - iVis * wtPtrF[1];
+      gridPtrF[1] += rVis * wtPtrF[1] + iVis * wtPtrF[0];
     }
   }
 }
@@ -581,7 +607,7 @@ void test_noncasa_access(int N, int convN) {
     }
   }
 
-  {
+  if (assert) {
     CFloat exp_c, act_c;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
@@ -596,11 +622,10 @@ void test_noncasa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
+    std::cout << "All assertions passed for SSE" << std::endl;
   }
 
-  std::cout << "All assertions passed for SSE" << std::endl;
-
-  {
+  if (assert) {
     CFloat exp_c, act_c;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
@@ -615,9 +640,8 @@ void test_noncasa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
+    std::cout << "All assertions passed for AVX" << std::endl;
   }
-
-  std::cout << "All assertions passed for AVX" << std::endl;
 }
 
 void test_casa_access(int N, int convN) {
@@ -680,7 +704,7 @@ void test_casa_access(int N, int convN) {
   }
 #endif
 
-  {
+  if (std_gridding) {
     auto start = std::chrono::steady_clock::now();
 
     // Gridding all points
@@ -701,6 +725,34 @@ void test_casa_access(int N, int convN) {
               << " ms" << std::endl;
   }
 
+  casacore::Matrix<casacore::Complex> grid_ptr(N, N);
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      grid_ptr(i, j) = casacore::Complex(0.0f, 0.0f);
+    }
+  }
+
+  if (ptr_gridding) {
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_ptr(grid_ptr, conv, cvis, u + offset, v + offset,
+                          support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock ptr gridding "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+  }
+
   casacore::Matrix<casacore::Complex> grid_1(N, N);
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
@@ -708,7 +760,7 @@ void test_casa_access(int N, int convN) {
     }
   }
 
-  {
+  if (sse_gridding) {
     auto start = std::chrono::steady_clock::now();
 
     // Gridding all points
@@ -736,7 +788,7 @@ void test_casa_access(int N, int convN) {
     }
   }
 
-  {
+  if (avx_gridding) {
     auto start = std::chrono::steady_clock::now();
 
     // Gridding all points
@@ -757,7 +809,7 @@ void test_casa_access(int N, int convN) {
               << " ms" << std::endl;
   }
 
-  {
+  if (assert) {
     casacore::Complex exp_c, act_c;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
@@ -772,11 +824,10 @@ void test_casa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
+    std::cout << "All assertions passed for SSE" << std::endl;
   }
 
-  std::cout << "All assertions passed for SSE" << std::endl;
-
-  {
+  if (assert) {
     casacore::Complex exp_c, act_c;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
@@ -791,15 +842,14 @@ void test_casa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
+    std::cout << "All assertions passed for AVX" << std::endl;
   }
-
-  std::cout << "All assertions passed for AVX" << std::endl;
 }
 
 int main() {
 
-  int N = 512;
-  int convN = 128;
+  int N = 1024;
+  int convN = 256;
 
   // test_simple_sse();
   // test_simple_avx();

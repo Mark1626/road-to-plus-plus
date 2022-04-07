@@ -66,28 +66,30 @@ void grid(complex4<float> &c, complex4<float> &a, complex4<float> &b) {
 
   __m256 twist1 = _mm256_permute_ps(b_vec, swap_mask);
 
-  // ra1ia1 ra2ia2 rb1ib1 rb2ib2
+  // ra1ib1 ia1rb1 ra2ib2 ia2rb2 ra3ib3 ia3rb3 ra1ib4 ia1rb4
   __m256 interm2 = _mm256_mul_ps(a_vec, twist1);
 
-  // ra1rb1 ia1ib1 ra2ia2 ia2ib2
-  // ra1ia1 ra2ia2 rb1ib1 rb2ib2
+  // interm 1 : ra1rb1 ia1ib1 ra2ia2 ia2ib2 ra3rb3 ia3ib3 ra4ia4 ia4ib4
+  // interm 2 : ra1ib1 ia1rb1 ra2ib2 ia2rb2 ra3ib3 ia3rb3 ra1ib4 ia1rb4
 
-  // ra1ia1 ia1ib1 rb1ib1 ia2ib2
+  // ra1rb1 ia1rb1 ra2ia2 ia2rb2 ra3rb3 ia3rb3 ra4ia4 ia1rb4
   __m256 interm3 = _mm256_blend_ps(interm1, interm2, sample1);
-  // ra1rb1 ra2ia2 ra2ia2 rb2ib2
+  // ra1ib1 ia1ib1 ra2ib2 ia2ib2 ra3ib3 ia3ib3 ra1ib4 ia4ib4
   __m256 interm4 = _mm256_blend_ps(interm1, interm2, sample2);
 
-  // ia1ib1 ra1ia1 ia2ib2 rb1ib1
+  // ia1ib1 ra1ib1 ia2ib2 ra2ib2 ia3ib3 ra3ib3 ia4ib4 ra1ib4
   interm3 = _mm256_permute_ps(interm3, swap_mask);
 
   __m256 sign_vec = _mm256_load_ps(sign);
-  // -ia1ib1 ra1ia1 -ia2ib2 rb1ib1
+  // -ia1ib1 ra1ib1 -ia2ib2 ra2ib2 -ia3ib3 ra3ib3 -ia4ib4 ra1ib4
   interm3 = _mm256_mul_ps(interm3, sign_vec);
 
+  // This final product of complex a * complex b
   __m256 res_vec = _mm256_add_ps(interm3, interm4);
 
   __m256 c_vec = _mm256_loadu_ps(c_raw);
 
+  // c = c + a * b
   c_vec = _mm256_add_ps(c_vec, res_vec);
 
   _mm256_storeu_ps(c_raw, c_vec);

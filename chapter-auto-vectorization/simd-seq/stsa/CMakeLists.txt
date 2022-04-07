@@ -8,7 +8,7 @@ add_library(stsoa_complex STATIC
   avx.cc
   )
 
-SET(COMPILE_FLAGS "-march=native")
+SET(COMPILE_FLAGS "-march=native -fcx-limited-range")
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS}")
 
