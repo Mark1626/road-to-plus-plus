@@ -3,8 +3,10 @@
 #include <casacore/casa/Arrays/Array.h>
 #include <casacore/casa/Arrays/Matrix.h>
 #include <casacore/casa/BasicSL/Complexfwd.h>
+#include <chrono>
 #include <complex>
 #include <immintrin.h>
+#include <iomanip>
 #include <string>
 #include <xmmintrin.h>
 
@@ -32,23 +34,25 @@ public:
 void assert_complex(std::string msg, CFloat expected, CFloat actual) {
   float exp = expected.real();
   float act = actual.real();
-  if (fabs(exp - act) > 0.01f) {
+  float tolerance = 0.1f;
+
+  if (fabs(exp - act) > tolerance) {
     std::cout << msg << " expected " << expected << " but was " << actual
               << std::endl;
     // std::cout << "Expected real part to be " << exp << " but was " << act
     //           << std::endl;
-    assert(fabs(exp - act) < 0.01f);
+    assert(fabs(exp - act) < tolerance);
   }
 
   exp = expected.imag();
   act = actual.imag();
-  if (fabs(exp - act) > 0.01f) {
+  if (fabs(exp - act) > tolerance) {
     std::cout << msg << " expected " << expected << " but was " << actual
               << std::endl;
     // std::cerr << "Expected imaginary part to be " << exp << " but was " <<
     // act
     //           << std::endl;
-    assert(fabs(exp - act) < 0.01f);
+    assert(fabs(exp - act) < tolerance);
   }
 }
 
@@ -80,7 +84,7 @@ void gridding_std(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
       CFloat wt = convFunc(voff, uoff);
 #ifdef DEBUG
       std::cerr << cVis << "*" << wt << "+" << grid(iv + suppv, iu + suppu)
-                << std::endl;
+                << " " << iv + suppv << " , " << iu + suppu << std::endl;
 #endif
       grid(iv + suppv, iu + suppu) += cVis * wt;
     }
@@ -125,12 +129,66 @@ void gridding_simd_2(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
   }
 }
 
+void gridding_simd_4(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
+                     const CFloat &cVis, const int iu, const int iv,
+                     const int support) {
+#ifdef DEBUG
+  std::cout << "Gridding simd avx" << std::endl;
+#endif
+  simd::complex4<float> cvis_vec = {.d = {cVis, cVis, cVis, cVis}};
+
+  for (int suppv = -support; suppv <= support; suppv++) {
+    const int voff = suppv + support;
+    int uoff = 0;
+
+    simd::complex4<float> *conv_vec =
+        reinterpret_cast<simd::complex4<float> *>(&convFunc(voff, uoff));
+    simd::complex4<float> *grid_vec = reinterpret_cast<simd::complex4<float> *>(
+        &grid(iv + suppv, iu - support));
+    ;
+
+    int rem = (2 * support + 1) % 4;
+    int tiles = (2 * support + 1) / 4;
+
+    // 2n+1, the last one can be done separately
+    for (int i = 0; i < tiles; i++) {
+#ifdef DEBUG
+      std::cout << cvis_vec.d[0] << "*" << conv_vec[i].d[0] << "+"
+                << grid_vec[i].d[0] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[1] << "*" << conv_vec[i].d[1] << "+"
+                << grid_vec[i].d[1] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[2] << "*" << conv_vec[i].d[2] << "+"
+                << grid_vec[i].d[2] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[3] << "*" << conv_vec[i].d[3] << "+"
+                << grid_vec[i].d[3] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+#endif
+      simd::grid(grid_vec[i], conv_vec[i], cvis_vec);
+    }
+
+    for (int i = 1; i <= rem; i++) {
+      // Last grid point
+      int suppu = support - rem + i;
+      uoff = suppu + support;
+      CFloat wt = convFunc(voff, uoff);
+#ifdef DEBUG
+      std::cout << cVis << "*" << wt << "+" << grid(iv + suppv, iu + suppu)
+                << std::endl;
+#endif
+      grid(iv + suppv, iu + suppu) += cVis * wt;
+    }
+  }
+}
+
 void gridding_casa_simd_2(casacore::Matrix<casacore::Complex> &grid,
                           casacore::Matrix<casacore::Complex> &convFunc,
                           const casacore::Complex &cVis, const int iu,
                           const int iv, const int support) {
 #ifdef DEBUG
-  std::cout << "Gridding simd casa" << std::endl;
+  std::cout << "Gridding simd 2 casa" << std::endl;
 #endif
   simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
 
@@ -161,6 +219,61 @@ void gridding_casa_simd_2(casacore::Matrix<casacore::Complex> &grid,
     uoff = suppu + support;
     casacore::Complex wt = convFunc(uoff, voff);
     grid(iu + suppu, iv + suppv) += cVis * wt;
+  }
+}
+
+void gridding_casa_simd_4(casacore::Matrix<casacore::Complex> &grid,
+                          casacore::Matrix<casacore::Complex> &convFunc,
+                          const casacore::Complex &cVis, const int iu,
+                          const int iv, const int support) {
+#ifdef DEBUG
+  std::cout << "Gridding simd avx casa" << std::endl;
+#endif
+  simd::complex4<float> cvis_vec = {.d = {cVis, cVis, cVis, cVis}};
+
+  for (int suppv = -support; suppv <= support; suppv++) {
+    const int voff = suppv + support;
+    int uoff = 0;
+
+    simd::complex4<float> *conv_vec =
+        reinterpret_cast<simd::complex4<float> *>(&convFunc(uoff, voff));
+    simd::complex4<float> *grid_vec = reinterpret_cast<simd::complex4<float> *>(
+        &grid(iu - support, iv + suppv));
+    ;
+
+    int rem = (2 * support + 1) % 4;
+    int tiles = (2 * support + 1) / 4;
+
+    // 2n+1, the last one can be done separately
+    for (int i = 0; i < tiles; i++) {
+#ifdef DEBUG
+      std::cout << cvis_vec.d[0] << "*" << conv_vec[i].d[0] << "+"
+                << grid_vec[i].d[0] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[1] << "*" << conv_vec[i].d[1] << "+"
+                << grid_vec[i].d[1] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[2] << "*" << conv_vec[i].d[2] << "+"
+                << grid_vec[i].d[2] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+      std::cout << cvis_vec.d[3] << "*" << conv_vec[i].d[3] << "+"
+                << grid_vec[i].d[3] << " " << iv + suppv << " , "
+                << iu - support << std::endl;
+#endif
+      simd::grid(grid_vec[i], conv_vec[i], cvis_vec);
+    }
+
+    for (int i = 1; i <= rem; i++) {
+      // Last grid point
+      int suppu = support - rem + i;
+      uoff = suppu + support;
+      CFloat wt = convFunc(uoff, voff);
+#ifdef DEBUG
+      std::cout << cVis << "*" << wt << "+" << grid(iu + suppu, iv + suppv)
+                << std::endl;
+#endif
+      grid(iu + suppu, iv + suppv) += cVis * wt;
+    }
   }
 }
 
@@ -302,7 +415,7 @@ void test_simple_avx() {
   for (int i = 0; i < N; i++) {
     c_arr_exp[i] = a_arr[i] * b_arr[i];
 #ifdef DEBUG
-    std::cout << a_arr[i] << "*" << b_arr[i] << "=" << c_arr_exp[i]
+    std::cerr << a_arr[i] << "*" << b_arr[i] << "=" << c_arr_exp[i]
               << std::endl;
 #endif
   }
@@ -324,7 +437,7 @@ void test_simple_avx() {
 #ifdef DEBUG
     std::cout << a_arr_vec[i].d[0] << "*" << b_arr_vec[i].d[0] << "="
               << c_arr_vec[i].d[0] << std::endl;
-    std::cout << a_arr_vec[i].d[0] << "*" << b_arr_vec[i].d[1] << "="
+    std::cout << a_arr_vec[i].d[1] << "*" << b_arr_vec[i].d[1] << "="
               << c_arr_vec[i].d[1] << std::endl;
     std::cout << a_arr_vec[i].d[2] << "*" << b_arr_vec[i].d[2] << "="
               << c_arr_vec[i].d[2] << std::endl;
@@ -355,8 +468,8 @@ void test_noncasa_access(int N, int convN) {
   int support = (convN / 2) - 1;
 
   Matrix<CFloat> visibility(N, N);
-  for (int i = 3; i < N - 3; i++) {
-    for (int j = 3; j < N - 3; j++) {
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
       auto real = (double)std::rand() / (double)(RAND_MAX / a);
       auto imag = (double)std::rand() / (double)(RAND_MAX / a);
       visibility(i, j) = CFloat(real, imag);
@@ -407,6 +520,15 @@ void test_noncasa_access(int N, int convN) {
         int iv = v + offset;
         CFloat cvis = visibility(iu, iv);
         gridding_std(grid_std, conv, cvis, u + offset, v + offset, support);
+#ifdef DEBUG
+        std::cerr << "Grid" << std::endl;
+        for (int i = 0; i < N; i++) {
+          for (int j = 0; j < N; j++) {
+            std::cerr << std::setprecision(2) << grid_std(i, j) << " ";
+          }
+          std::cerr << std::endl;
+        }
+#endif
       }
     }
   }
@@ -430,6 +552,35 @@ void test_noncasa_access(int N, int convN) {
     }
   }
 
+  Matrix<CFloat> grid_2(N, N);
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      grid_2(i, j) = CFloat(0.0f, 0.0f);
+    }
+  }
+
+  {
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        CFloat cvis = visibility(iu, iv);
+        gridding_simd_4(grid_2, conv, cvis, u + offset, v + offset, support);
+
+#ifdef DEBUG
+        std::cout << "Grid" << std::endl;
+        for (int i = 0; i < N; i++) {
+          for (int j = 0; j < N; j++) {
+            std::cout << std::setprecision(2) << grid_2(i, j) << " ";
+          }
+          std::cout << std::endl;
+        }
+#endif
+      }
+    }
+  }
+
   {
     CFloat exp_c, act_c;
     for (int i = 0; i < N; i++) {
@@ -445,9 +596,28 @@ void test_noncasa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
-
-    std::cout << "All assertions passed for Comparison" << std::endl;
   }
+
+  std::cout << "All assertions passed for SSE" << std::endl;
+
+  {
+    CFloat exp_c, act_c;
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        // ASKAPCHECK(1==2, "1!=2");
+        exp_c = grid_std(j, i);
+        act_c = grid_2(j, i);
+
+        assert_complex("Asserting point: " + std::to_string(i) + " " +
+                           std::to_string(j),
+                       exp_c, act_c);
+        // ASKAPLOG_INFO_STR(logger, "A: " << grid_std(j, i) << " ");
+        // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
+      }
+    }
+  }
+
+  std::cout << "All assertions passed for AVX" << std::endl;
 }
 
 void test_casa_access(int N, int convN) {
@@ -465,8 +635,8 @@ void test_casa_access(int N, int convN) {
   int support = (convN / 2) - 1;
 
   casacore::Matrix<casacore::Complex> visibility(N, N);
-  for (int i = 3; i < N - 3; i++) {
-    for (int j = 3; j < N - 3; j++) {
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
       auto real = (double)std::rand() / (double)(RAND_MAX / a);
       auto imag = (double)std::rand() / (double)(RAND_MAX / a);
       visibility(i, j) = casacore::Complex(real, imag);
@@ -501,14 +671,18 @@ void test_casa_access(int N, int convN) {
     }
   }
 
+#ifdef DEBUG
   for (int i = 0; i < convN; i++) {
     for (int j = 0; j < convN; j++) {
       std::cout << conv(i, j) << " ";
     }
     std::cout << std::endl;
   }
+#endif
 
   {
+    auto start = std::chrono::steady_clock::now();
+
     // Gridding all points
     for (int u = 0; u < N - 2 * offset; u++) {
       for (int v = 0; v < N - 2 * offset; v++) {
@@ -519,6 +693,12 @@ void test_casa_access(int N, int convN) {
                           support);
       }
     }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock Std gridding "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
   }
 
   casacore::Matrix<casacore::Complex> grid_1(N, N);
@@ -529,6 +709,8 @@ void test_casa_access(int N, int convN) {
   }
 
   {
+    auto start = std::chrono::steady_clock::now();
+
     // Gridding all points
     for (int u = 0; u < N - 2 * offset; u++) {
       for (int v = 0; v < N - 2 * offset; v++) {
@@ -539,6 +721,40 @@ void test_casa_access(int N, int convN) {
                              support);
       }
     }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock SIMD 2 Tiled gridding "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+  }
+
+  casacore::Matrix<casacore::Complex> grid_2(N, N);
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      grid_2(i, j) = casacore::Complex(0.0f, 0.0f);
+    }
+  }
+
+  {
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_simd_4(grid_2, conv, cvis, u + offset, v + offset,
+                             support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock SIMD 4 Tiled gridding "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
   }
 
   {
@@ -556,25 +772,44 @@ void test_casa_access(int N, int convN) {
         // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
       }
     }
-
-    std::cout << "All assertions passed for Comparison" << std::endl;
   }
+
+  std::cout << "All assertions passed for SSE" << std::endl;
+
+  {
+    casacore::Complex exp_c, act_c;
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        // ASKAPCHECK(1==2, "1!=2");
+        exp_c = grid_std(j, i);
+        act_c = grid_2(j, i);
+
+        assert_complex("Asserting point: " + std::to_string(i) + " " +
+                           std::to_string(j),
+                       exp_c, act_c);
+        // ASKAPLOG_INFO_STR(logger, "A: " << grid_std(j, i) << " ");
+        // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
+      }
+    }
+  }
+
+  std::cout << "All assertions passed for AVX" << std::endl;
 }
 
 int main() {
 
-  int N = 16;
-  int convN = 8;
+  int N = 512;
+  int convN = 128;
 
   // test_simple_sse();
   // test_simple_avx();
 
   // casacore::Matrix<casacore::Complex> grid(N, N);
 
-  printf("Access without CASA\n");
+  // printf("Access without CASA\n");
   // test_noncasa_access(N, convN);
 
+  printf("Access with CASA\n");
   test_casa_access(N, convN);
-  // printf("Access with CASA\n");
   // test_casa_access();
 }

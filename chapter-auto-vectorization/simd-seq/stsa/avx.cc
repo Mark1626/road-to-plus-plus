@@ -90,7 +90,7 @@ void grid(complex4<float> &c, complex4<float> &a, complex4<float> &b) {
 
   c_vec = _mm256_add_ps(c_vec, res_vec);
 
-  _mm256_storeu_ps(c_raw, res_vec);
+  _mm256_storeu_ps(c_raw, c_vec);
 }
 
 } // namespace simd
