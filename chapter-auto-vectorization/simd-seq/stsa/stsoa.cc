@@ -7,15 +7,20 @@
 #include <complex>
 #include <immintrin.h>
 #include <iomanip>
+#include <iostream>
 #include <string>
 #include <xmmintrin.h>
 
 // #define DEBUG
 bool assert = false;
 bool avx_gridding = true;
-bool sse_gridding = true;
-bool ptr_gridding = true;
-bool std_gridding = true;
+bool sse_gridding = false;
+bool ptr_gridding = false;
+bool std_gridding = false;
+bool omp_simd = false;
+bool simd_2_omp_variant = false;
+bool std_new_gridding = false;
+bool sse_gridding_new = false;
 
 typedef std::complex<float> CFloat;
 
@@ -76,6 +81,22 @@ void gridding_casa_std(casacore::Matrix<casacore::Complex> &grid,
   }
 }
 
+void gridding_casa_std_new(casacore::Matrix<casacore::Complex> &grid,
+                       casacore::Matrix<casacore::Complex> &convFunc,
+                       const casacore::Complex &cVis, const int iu,
+                       const int iv, const int support) {
+  casacore::Complex* convPtr = &convFunc(0, 0);
+  casacore::Complex* gridPtr = &grid(iv - support, iu - support);
+  const int conv_size = 2*support + 1;
+
+  for (int voff = 0; voff < conv_size; voff++) {
+    for (int uoff = 0; uoff < conv_size; uoff++) {
+      casacore::Complex wt = convPtr[voff * conv_size + uoff];
+      gridPtr[voff * conv_size + uoff] += cVis * wt;
+    }
+  }
+}
+
 void gridding_casa_ptr(casacore::Matrix<casacore::Complex> &grid,
                        casacore::Matrix<casacore::Complex> &conv,
                        const casacore::Complex &cVis, const int iu,
@@ -93,6 +114,21 @@ void gridding_casa_ptr(casacore::Matrix<casacore::Complex> &grid,
          suppu++, wtPtrF += 2, gridPtrF += 2) {
       gridPtrF[0] += rVis * wtPtrF[0] - iVis * wtPtrF[1];
       gridPtrF[1] += rVis * wtPtrF[1] + iVis * wtPtrF[0];
+    }
+  }
+}
+
+void gridding_casa_std_variant(casacore::Matrix<casacore::Complex> &grid,
+                               casacore::Matrix<casacore::Complex> &convFunc,
+                               const casacore::Complex &cVis, const int iu,
+                               const int iv, const int support) {
+#pragma omp simd collapse(2)
+  for (int voff = 0; voff <= 2 * support; voff++) {
+    for (int suppu = -support; suppu <= support; suppu++) {
+      const int suppv = voff - support;
+      const int uoff = suppu + support;
+      CFloat wt = convFunc(voff, uoff);
+      grid(iv + suppv, iu + suppu) += cVis * wt;
     }
   }
 }
@@ -152,6 +188,41 @@ void gridding_simd_2(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
     uoff = suppu + support;
     CFloat wt = convFunc(voff, uoff);
     grid(iv + suppv, iu + suppu) += cVis * wt;
+  }
+}
+
+void gridding_casa_simd_2_variant(casacore::Matrix<casacore::Complex> &grid,
+                                  casacore::Matrix<casacore::Complex> &convFunc,
+                                  const casacore::Complex &cVis, const int iu,
+                                  const int iv, const int support) {
+  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+
+  // for (int suppv = -support; suppv <= support; suppv++) {
+  //   const int voff = suppv + support;
+  int uoff = 0;
+#pragma omp simd collapse(2)
+  for (int voff = 0; voff <= 2 * support; voff++) {
+    // 2n+1, the last one can be done separately
+    for (int i = 0; i < support; i++) {
+      const int suppv = voff - support;
+      simd::complex2<float> *conv_vec =
+          reinterpret_cast<simd::complex2<float> *>(&convFunc(voff, uoff));
+      simd::complex2<float> *grid_vec =
+          reinterpret_cast<simd::complex2<float> *>(
+              &grid(iv + suppv, iu - support));
+
+      simd::grid(grid_vec[i], conv_vec[i], cvis_vec);
+    }
+  }
+
+#pragma omp simd
+  for (int voff = 0; voff <= 2 * support; voff++) {
+    const int suppv = voff - support;
+    // Last grid point
+    const int suppu = support;
+    const int uoff = suppu + support;
+    casacore::Complex wt = convFunc(uoff, voff);
+    grid(iu + suppu, iv + suppv) += cVis * wt;
   }
 }
 
@@ -245,6 +316,34 @@ void gridding_casa_simd_2(casacore::Matrix<casacore::Complex> &grid,
     uoff = suppu + support;
     casacore::Complex wt = convFunc(uoff, voff);
     grid(iu + suppu, iv + suppv) += cVis * wt;
+  }
+}
+
+void gridding_casa_simd_2_new(casacore::Matrix<casacore::Complex> &grid,
+                          casacore::Matrix<casacore::Complex> &convFunc,
+                          const casacore::Complex &cVis, const int iu,
+                          const int iv, const int support) {
+
+  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+
+  casacore::Complex* convPtr = &convFunc(0, 0);
+  casacore::Complex* gridPtr = &grid(iv - support, iu - support);
+  const int conv_size = 2*support + 1;
+
+  #pragma omp simd collapse(2)
+  for (int voff = 0; voff < conv_size; voff++) {
+    for (int uoff = 0; uoff < conv_size; uoff++) {
+
+      simd::complex2<float> *conv_vec =
+        reinterpret_cast<simd::complex2<float> *>(&convPtr[voff * conv_size]);
+    simd::complex2<float> *grid_vec = reinterpret_cast<simd::complex2<float> *>(
+        &gridPtr[voff * conv_size]);
+
+        simd::grid(grid_vec[uoff], conv_vec[uoff], cvis_vec);
+
+      // casacore::Complex wt = convPtr[voff * conv_size + uoff];
+      // gridPtr[voff * conv_size + uoff] += cVis * wt;
+    }
   }
 }
 
@@ -522,13 +621,6 @@ void test_noncasa_access(int N, int convN) {
 
   int offset = support;
 
-  Matrix<CFloat> grid_std(N, N);
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      grid_std(i, j) = CFloat(0.0f, 0.0f);
-    }
-  }
-
 #ifdef DEBUG
   for (int i = 0; i < convN; i++) {
     for (int j = 0; j < convN; j++) {
@@ -537,6 +629,13 @@ void test_noncasa_access(int N, int convN) {
     std::cout << std::endl;
   }
 #endif
+
+  Matrix<CFloat> grid_std(N, N);
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      grid_std(i, j) = CFloat(0.0f, 0.0f);
+    }
+  }
 
   {
     // Gridding all points
@@ -725,14 +824,60 @@ void test_casa_access(int N, int convN) {
               << " ms" << std::endl;
   }
 
-  casacore::Matrix<casacore::Complex> grid_ptr(N, N);
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      grid_ptr(i, j) = casacore::Complex(0.0f, 0.0f);
+  if (std_new_gridding) {
+    casacore::Matrix<casacore::Complex> grid_ptr(N, N);
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        grid_ptr(i, j) = casacore::Complex(0.0f, 0.0f);
+      }
+    }
+
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_std_new(grid_ptr, conv, cvis, u + offset, v + offset,
+                          support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock new std gridding "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+    
+    if (assert) {
+      casacore::Complex exp_c, act_c;
+      for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+          // ASKAPCHECK(1==2, "1!=2");
+          exp_c = grid_std(j, i);
+          act_c = grid_ptr(j, i);
+
+          assert_complex("Asserting point: " + std::to_string(i) + " " +
+                            std::to_string(j),
+                        exp_c, act_c);
+          // ASKAPLOG_INFO_STR(logger, "A: " << grid_std(j, i) << " ");
+          // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
+        }
+      }
+      std::cout << "All assertions passed for SSE" << std::endl;
     }
   }
 
   if (ptr_gridding) {
+    casacore::Matrix<casacore::Complex> grid_ptr(N, N);
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        grid_ptr(i, j) = casacore::Complex(0.0f, 0.0f);
+      }
+    }
+
     auto start = std::chrono::steady_clock::now();
 
     // Gridding all points
@@ -753,10 +898,43 @@ void test_casa_access(int N, int convN) {
               << " ms" << std::endl;
   }
 
-  casacore::Matrix<casacore::Complex> grid_1(N, N);
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  if (omp_simd) {
+
+    casacore::Matrix<casacore::Complex> grid_std_var(N, N);
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        grid_std_var(i, j) = casacore::Complex(0.0f, 0.0f);
+      }
+    }
+
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_std_variant(grid_std_var, conv, cvis, u + offset,
+                                  v + offset, support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock Std gridding variant "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+  }
+
+  /////////////////////////////////////////////////////////////
+
+  casacore::Matrix<casacore::Complex> grid_sse(N, N);
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      grid_1(i, j) = casacore::Complex(0.0f, 0.0f);
+      grid_sse(i, j) = casacore::Complex(0.0f, 0.0f);
     }
   }
 
@@ -769,7 +947,7 @@ void test_casa_access(int N, int convN) {
         int iu = u + offset;
         int iv = v + offset;
         casacore::Complex cvis = visibility(iu, iv);
-        gridding_casa_simd_2(grid_1, conv, cvis, u + offset, v + offset,
+        gridding_casa_simd_2(grid_sse, conv, cvis, u + offset, v + offset,
                              support);
       }
     }
@@ -781,10 +959,69 @@ void test_casa_access(int N, int convN) {
               << " ms" << std::endl;
   }
 
-  casacore::Matrix<casacore::Complex> grid_2(N, N);
+  if (sse_gridding_new) {
+    casacore::Matrix<casacore::Complex> grid_sse_1(N, N);
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        grid_sse_1(i, j) = casacore::Complex(0.0f, 0.0f);
+      }
+    }
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_simd_2_new(grid_sse_1, conv, cvis, u + offset, v + offset,
+                             support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock SIMD 2 Tiled gridding new "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  if (simd_2_omp_variant) {
+    casacore::Matrix<casacore::Complex> grid_std_var_p(N, N);
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        grid_std_var_p(i, j) = casacore::Complex(0.0f, 0.0f);
+      }
+    }
+
+    auto start = std::chrono::steady_clock::now();
+
+    // Gridding all points
+    for (int u = 0; u < N - 2 * offset; u++) {
+      for (int v = 0; v < N - 2 * offset; v++) {
+        int iu = u + offset;
+        int iv = v + offset;
+        casacore::Complex cvis = visibility(iu, iv);
+        gridding_casa_simd_2_variant(grid_std_var_p, conv, cvis, u + offset,
+                                     v + offset, support);
+      }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << "CPP Wallclock SSE simd variant "
+              << (std::chrono::duration<double, std::milli>(diff).count())
+              << " ms" << std::endl;
+  }
+
+  //////////////////////////////////////////////////////////////
+
+  casacore::Matrix<casacore::Complex> grid_avx(N, N);
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      grid_2(i, j) = casacore::Complex(0.0f, 0.0f);
+      grid_avx(i, j) = casacore::Complex(0.0f, 0.0f);
     }
   }
 
@@ -797,14 +1034,14 @@ void test_casa_access(int N, int convN) {
         int iu = u + offset;
         int iv = v + offset;
         casacore::Complex cvis = visibility(iu, iv);
-        gridding_casa_simd_4(grid_2, conv, cvis, u + offset, v + offset,
+        gridding_casa_simd_4(grid_avx, conv, cvis, u + offset, v + offset,
                              support);
       }
     }
 
     auto end = std::chrono::steady_clock::now();
     auto diff = end - start;
-    std::cout << "CPP Wallclock SIMD 4 Tiled gridding "
+    std::cout << "CPP Wallclock gridding avx "
               << (std::chrono::duration<double, std::milli>(diff).count())
               << " ms" << std::endl;
   }
@@ -815,7 +1052,7 @@ void test_casa_access(int N, int convN) {
       for (int j = 0; j < N; j++) {
         // ASKAPCHECK(1==2, "1!=2");
         exp_c = grid_std(j, i);
-        act_c = grid_1(j, i);
+        act_c = grid_sse(j, i);
 
         assert_complex("Asserting point: " + std::to_string(i) + " " +
                            std::to_string(j),
@@ -833,7 +1070,7 @@ void test_casa_access(int N, int convN) {
       for (int j = 0; j < N; j++) {
         // ASKAPCHECK(1==2, "1!=2");
         exp_c = grid_std(j, i);
-        act_c = grid_2(j, i);
+        act_c = grid_avx(j, i);
 
         assert_complex("Asserting point: " + std::to_string(i) + " " +
                            std::to_string(j),
@@ -848,8 +1085,8 @@ void test_casa_access(int N, int convN) {
 
 int main() {
 
-  int N = 1024;
-  int convN = 256;
+  int N = 512;
+  int convN = 128;
 
   // test_simple_sse();
   // test_simple_avx();

@@ -14,3 +14,7 @@ simd-seq/complex-dot/complex-dot
 simd-seq/grid/base
 simd-seq/grid/grid
 simd-seq/grid/poc
+
+*.csv
+*.bib
+**/*.dSYM/
