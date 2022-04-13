@@ -82,12 +82,12 @@ void gridding_casa_std(casacore::Matrix<casacore::Complex> &grid,
 }
 
 void gridding_casa_std_new(casacore::Matrix<casacore::Complex> &grid,
-                       casacore::Matrix<casacore::Complex> &convFunc,
-                       const casacore::Complex &cVis, const int iu,
-                       const int iv, const int support) {
-  casacore::Complex* convPtr = &convFunc(0, 0);
-  casacore::Complex* gridPtr = &grid(iv - support, iu - support);
-  const int conv_size = 2*support + 1;
+                           casacore::Matrix<casacore::Complex> &convFunc,
+                           const casacore::Complex &cVis, const int iu,
+                           const int iv, const int support) {
+  casacore::Complex *convPtr = &convFunc(0, 0);
+  casacore::Complex *gridPtr = &grid(iv - support, iu - support);
+  const int conv_size = 2 * support + 1;
 
   for (int voff = 0; voff < conv_size; voff++) {
     for (int uoff = 0; uoff < conv_size; uoff++) {
@@ -159,7 +159,8 @@ void gridding_simd_2(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
 #ifdef DEBUG
   std::cout << "Gridding simd" << std::endl;
 #endif
-  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+  simd::complex2<float> cvis_vec = {
+      .d = {cVis.real(), cVis.imag(), cVis.real(), cVis.imag()}};
 
   for (int suppv = -support; suppv <= support; suppv++) {
     const int voff = suppv + support;
@@ -195,7 +196,8 @@ void gridding_casa_simd_2_variant(casacore::Matrix<casacore::Complex> &grid,
                                   casacore::Matrix<casacore::Complex> &convFunc,
                                   const casacore::Complex &cVis, const int iu,
                                   const int iv, const int support) {
-  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+  simd::complex2<float> cvis_vec = {
+      .d = {cVis.real(), cVis.imag(), cVis.real(), cVis.imag()}};
 
   // for (int suppv = -support; suppv <= support; suppv++) {
   //   const int voff = suppv + support;
@@ -232,7 +234,9 @@ void gridding_simd_4(Matrix<CFloat> &grid, Matrix<CFloat> &convFunc,
 #ifdef DEBUG
   std::cout << "Gridding simd avx" << std::endl;
 #endif
-  simd::complex4<float> cvis_vec = {.d = {cVis, cVis, cVis, cVis}};
+  simd::complex4<float> cvis_vec = {.d = {cVis.real(), cVis.imag(), cVis.real(),
+                                          cVis.imag(), cVis.real(), cVis.imag(),
+                                          cVis.real(), cVis.imag()}};
 
   for (int suppv = -support; suppv <= support; suppv++) {
     const int voff = suppv + support;
@@ -287,7 +291,8 @@ void gridding_casa_simd_2(casacore::Matrix<casacore::Complex> &grid,
 #ifdef DEBUG
   std::cout << "Gridding simd 2 casa" << std::endl;
 #endif
-  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+  simd::complex2<float> cvis_vec = {
+      .d = {cVis.real(), cVis.imag(), cVis.real(), cVis.imag()}};
 
   for (int suppv = -support; suppv <= support; suppv++) {
     const int voff = suppv + support;
@@ -320,26 +325,27 @@ void gridding_casa_simd_2(casacore::Matrix<casacore::Complex> &grid,
 }
 
 void gridding_casa_simd_2_new(casacore::Matrix<casacore::Complex> &grid,
-                          casacore::Matrix<casacore::Complex> &convFunc,
-                          const casacore::Complex &cVis, const int iu,
-                          const int iv, const int support) {
+                              casacore::Matrix<casacore::Complex> &convFunc,
+                              const casacore::Complex &cVis, const int iu,
+                              const int iv, const int support) {
 
-  simd::complex2<float> cvis_vec = {.d = {cVis, cVis}};
+  simd::complex2<float> cvis_vec = {
+      .d = {cVis.real(), cVis.imag(), cVis.real(), cVis.imag()}};
 
-  casacore::Complex* convPtr = &convFunc(0, 0);
-  casacore::Complex* gridPtr = &grid(iv - support, iu - support);
-  const int conv_size = 2*support + 1;
+  casacore::Complex *convPtr = &convFunc(0, 0);
+  casacore::Complex *gridPtr = &grid(iv - support, iu - support);
+  const int conv_size = 2 * support + 1;
 
-  #pragma omp simd collapse(2)
+#pragma omp simd collapse(2)
   for (int voff = 0; voff < conv_size; voff++) {
     for (int uoff = 0; uoff < conv_size; uoff++) {
 
       simd::complex2<float> *conv_vec =
-        reinterpret_cast<simd::complex2<float> *>(&convPtr[voff * conv_size]);
-    simd::complex2<float> *grid_vec = reinterpret_cast<simd::complex2<float> *>(
-        &gridPtr[voff * conv_size]);
+          reinterpret_cast<simd::complex2<float> *>(&convPtr[voff * conv_size]);
+      simd::complex2<float> *grid_vec =
+          reinterpret_cast<simd::complex2<float> *>(&gridPtr[voff * conv_size]);
 
-        simd::grid(grid_vec[uoff], conv_vec[uoff], cvis_vec);
+      simd::grid(grid_vec[uoff], conv_vec[uoff], cvis_vec);
 
       // casacore::Complex wt = convPtr[voff * conv_size + uoff];
       // gridPtr[voff * conv_size + uoff] += cVis * wt;
@@ -354,7 +360,9 @@ void gridding_casa_simd_4(casacore::Matrix<casacore::Complex> &grid,
 #ifdef DEBUG
   std::cout << "Gridding simd avx casa" << std::endl;
 #endif
-  simd::complex4<float> cvis_vec = {.d = {cVis, cVis, cVis, cVis}};
+  simd::complex4<float> cvis_vec = {.d = {cVis.real(), cVis.imag(), cVis.real(),
+                                          cVis.imag(), cVis.real(), cVis.imag(),
+                                          cVis.real(), cVis.imag()}};
 
   for (int suppv = -support; suppv <= support; suppv++) {
     const int voff = suppv + support;
@@ -841,7 +849,7 @@ void test_casa_access(int N, int convN) {
         int iv = v + offset;
         casacore::Complex cvis = visibility(iu, iv);
         gridding_casa_std_new(grid_ptr, conv, cvis, u + offset, v + offset,
-                          support);
+                              support);
       }
     }
 
@@ -850,7 +858,7 @@ void test_casa_access(int N, int convN) {
     std::cout << "CPP Wallclock new std gridding "
               << (std::chrono::duration<double, std::milli>(diff).count())
               << " ms" << std::endl;
-    
+
     if (assert) {
       casacore::Complex exp_c, act_c;
       for (int i = 0; i < N; i++) {
@@ -860,8 +868,8 @@ void test_casa_access(int N, int convN) {
           act_c = grid_ptr(j, i);
 
           assert_complex("Asserting point: " + std::to_string(i) + " " +
-                            std::to_string(j),
-                        exp_c, act_c);
+                             std::to_string(j),
+                         exp_c, act_c);
           // ASKAPLOG_INFO_STR(logger, "A: " << grid_std(j, i) << " ");
           // ASKAPLOG_INFO_STR(logger, "E: " << grid_expected(j, i) << " ");
         }
@@ -975,7 +983,7 @@ void test_casa_access(int N, int convN) {
         int iv = v + offset;
         casacore::Complex cvis = visibility(iu, iv);
         gridding_casa_simd_2_new(grid_sse_1, conv, cvis, u + offset, v + offset,
-                             support);
+                                 support);
       }
     }
 
@@ -1085,8 +1093,11 @@ void test_casa_access(int N, int convN) {
 
 int main() {
 
-  int N = 512;
-  int convN = 128;
+  // int N = 512;
+  // int convN = 128;
+
+  int N = 1024;
+  int convN = 256;
 
   // test_simple_sse();
   // test_simple_avx();

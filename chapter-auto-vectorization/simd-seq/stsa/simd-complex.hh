@@ -16,7 +16,7 @@ template <typename T> struct complex2 {
 
 template <> struct complex2<float> {
   alignas(16) float d[4];
-} __attribute__((__packed__, __may_alias__));
+} __attribute__((__packed__, __may_alias__, __aligned__(16)));
 
 // TODO: Support double
 // AVX
@@ -26,7 +26,7 @@ template <typename T> struct complex4 {
 
 template <> struct complex4<float> {
   alignas(32) float d[8];
-} __attribute__((__packed__, __may_alias__));
+} __attribute__((__packed__, __may_alias__, __aligned__(32)));
 
 // TODO: AVX-512 if AMD Milan-X supports
 
