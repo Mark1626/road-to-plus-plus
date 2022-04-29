@@ -12,11 +12,11 @@
 #include <xmmintrin.h>
 
 // #define DEBUG
-bool assert = false;
+bool assert = true;
 bool avx_gridding = true;
-bool sse_gridding = false;
+bool sse_gridding = true;
 bool ptr_gridding = false;
-bool std_gridding = false;
+bool std_gridding = true;
 bool omp_simd = false;
 bool simd_2_omp_variant = false;
 bool std_new_gridding = false;
@@ -1096,7 +1096,7 @@ int main() {
   // int N = 512;
   // int convN = 128;
 
-  int N = 1024;
+  int N = 512;
   int convN = 256;
 
   // test_simple_sse();
