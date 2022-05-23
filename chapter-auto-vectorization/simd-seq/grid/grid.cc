@@ -10,7 +10,7 @@
 const int support = 128;
 
 const int st = 2 * support;
-const int en = 4 * support;
+const int en = 6 * support;
 
 BENCHMARK(BM_grid_std_complex)->Ranges({{st, en}, {support, support}})
 #ifdef MILLI

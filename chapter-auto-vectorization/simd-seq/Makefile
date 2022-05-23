@@ -18,7 +18,8 @@ complex-dot/complex-dot: complex-dot/complex-dot.cc \
 
 grid/grid: grid/grid.cc grid/base.cc \
 					grid/ptr.cc grid/complex2-simd.cc \
-					grid/complex2-simd.cc
+					grid/complex2-simd.cc grid/complex-simd-v2.cc \
+					grid/complex-simd-v3.cc
 	$(CXX) -o $@ $< $(CXXFLAGS) `pkg-config --cflags --libs benchmark` -DMILLI
 
 clean:

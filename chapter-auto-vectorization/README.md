@@ -2,7 +2,7 @@
 
 ## Techniques
 
-### LLVM Auto Vectorization
+### Auto Vectorization
 
 - Cost model for vectorization decides if vectorization can give a performance improvement
 
@@ -11,6 +11,11 @@
 Adding optimization remarks to check if loop was vectorized
 
 `-Rpass=loop-vectorize`
+
+#### GCC Auto vectorization report
+
+`-fopt-info-vec`
+
 
 ### OpenMP
 
@@ -109,7 +114,12 @@ void fn(char* buffer, char* state) {
 }
 ```
 
-#### Case Study - Alignment
+#### Case Study - SIMD Tiled Structure of Array
+
+Refer to the sub README of this topip [SIMD Tiled Structure of Array](./simd-seq/README.md)
+
+#### Case Study - Accumulate
+
 
 ## Reference
 
