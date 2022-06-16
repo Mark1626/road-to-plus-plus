@@ -1,5 +1,7 @@
 # Auto Vectorization
 
+Also read [On Data Parallelism](./data-parallel.md)
+
 ## Techniques
 
 ### Auto Vectorization
@@ -16,6 +18,7 @@ Adding optimization remarks to check if loop was vectorized
 
 `-fopt-info-vec`
 
+[GCC Developer Options](https://gcc.gnu.org/onlinedocs/gcc/Developer-Options.html)
 
 ### OpenMP
 
