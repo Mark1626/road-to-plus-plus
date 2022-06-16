@@ -18,8 +18,10 @@ Case 3 - xxtea middle block block collider in OpenMP target constructs
 
 Case 4 - Conditional and Nested OpenMP usage. Nested thread spawning has to be enabled with `omp_set_nested(1)`, control on how many threads to spawn can be done with `OMP_NUM_THREADS=2,8`
 
+Case 5: A curious behaviour in reduction. In reduction if there is a variable changed by a thread, it is not visible to other threads even if barrier is called.
 
-Interstingly `omp master` is several times faster than `omp single`, look at case study the [other chapter](../chapter-acceleration/openacc/sandpile/README.md)
+
+Interstingly `omp master` is several times faster than `omp single` as there is no implicit barrier at the end of the master region, other threads can continue beyond the region without waiting, look at case study the [other chapter](../chapter-acceleration/openacc/sandpile/README.md)
 
 ## Debugging
 
