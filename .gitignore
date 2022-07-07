@@ -3,3 +3,4 @@ gmon.out
 build
 *.o
 *.ppm
+compile_flags.txt

@@ -15,6 +15,8 @@ simd-seq/grid/base
 simd-seq/grid/grid
 simd-seq/grid/poc
 
+omp/unroll/unroll
+omp/reduction/reduction
+
 *.csv
-*.bib
 **/*.dSYM/

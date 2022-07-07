@@ -35,7 +35,6 @@ void func(int *a, int *b, int N) {
 }
 ```
 
-
 ### Case Studies
 
 #### Case Study 1 - Aliasing - Potentially Overlapping Pointers
@@ -122,6 +121,15 @@ void fn(char* buffer, char* state) {
 Refer to the sub README of this topip [SIMD Tiled Structure of Array](./simd-seq/README.md)
 
 #### Case Study - Accumulate
+
+#### Case Study - Reduction and unroll
+
+[Reduction and unroll](./omp)
+
+```
+make unroll/unroll
+make reduction/reduction
+```
 
 
 ## Reference

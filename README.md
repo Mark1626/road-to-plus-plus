@@ -112,6 +112,7 @@ Below each chapter noting down the things I learnt in the process
 - [Domain Decomposition](https://github.com/arielshao/Domain-Decomposition-)
 - [Awesome C++](https://github.com/rigtorp/awesome-modern-cpp)
 - [Advanced OpenMP](https://openmpcon.org/wp-content/uploads/openmpcon2017/Tutorial2-Advanced_OpenMP.pdf)
+- [Introduction to HPC](https://andreask.cs.illinois.edu/Teaching/HPCFall2012/)
 
 ## Blogs
 
@@ -120,4 +121,6 @@ Below each chapter noting down the things I learnt in the process
 - [Fredrik Johansson Blog](https://fredrikj.net/blog/) scientific computing, python
 - [John Burkardt's Blog](https://people.math.sc.edu/Burkardt/) hpc, mpi, openmp
 - [Scott Meyers](https://aristeia.com/)
+- [Frank Tetzel](https://tetzank.github.io/)
+- [Wojciech Muła](http://0x80.pl/)
 
