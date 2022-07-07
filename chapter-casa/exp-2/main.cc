@@ -1,7 +1,7 @@
 #include "casacore/casa/Arrays/Vector.h"
 #include <casacore/casa/Arrays/Matrix.h>
+#include <casacore/casa/Arrays/Cube.h>
 #include <casacore/casa/aipstype.h>
-#include <casacore/casa/Arrays.h>
 #include <iostream>
 
 int main() {
