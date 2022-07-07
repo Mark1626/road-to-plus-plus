@@ -1,10 +1,12 @@
+#include "mpi.h"
 #include <stdio.h>
 #include <mpi.h>
 
 int main(int argc, char** argv) {
   char buf[256];
   int my_rank, num_procs;
-  MPI_Init(&argc, &argv);
+  int provided;
+  MPI_Init_thread(&argc, &argv, MPI_THREAD_FUNNELED, &provided);
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
