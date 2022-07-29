@@ -131,6 +131,9 @@ make unroll/unroll
 make reduction/reduction
 ```
 
+#### Gaussian Filter
+
+This case study was done to see if optimization can be possible in SoFiA
 
 ## Reference
 
