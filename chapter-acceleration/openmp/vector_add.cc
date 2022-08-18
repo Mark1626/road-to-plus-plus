@@ -4,7 +4,7 @@
 static const int LIMIT = 1 << 26;
 
 void add(int* __restrict__ a, int* __restrict__ b, int* __restrict__ c) {
-  #pragma omp target map(to:a,b) map(tofrom:c)
+  #pragma omp target map(to:a[:LIMIT],b[:LIMIT]) map(tofrom:c[:LIMIT])
   {
     #pragma omp teams distribute parallel for
     for (int i = 0; i < LIMIT; i++) {

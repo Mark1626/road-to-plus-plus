@@ -1,6 +1,11 @@
 
 # GPUs
 
+Also checkout some of my case studies
+
+1. [HBM Case study](https://github.com/Mark1626/hbm-case-study)
+2. [Case study of CASA's sliding array median for ASKAP's Selavy](https://gitlab.com/nimalan-m/sliding-array-math-casestudy)
+
 [AMD inline assembly](https://github.com/RadeonOpenCompute/ROCm/issues/405)
 
 # OpenCL

@@ -27,6 +27,9 @@ collide_gpu: collide_gpu.cc
 collide: collide.c
 	$(CC) -o $@ $< $(CXXFLAGS) $(OPENMPFLAG)
 
+offload-case-studies/offload-case-studies: offload-case-studies/offload-case-studies.cc
+	$(CXX) -o $@ $< $(CXXFLAGS) $(OPENMPFLAG) $(OFFLOADFLAGS)
+
 clean:
 	$(RM) vector_add_cpu vector_add_gpu reduction_cpu reduction_gpu collide_cpu collide_gpu
 
