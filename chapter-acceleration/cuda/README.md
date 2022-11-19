@@ -34,6 +34,11 @@ This is done to ensure thread reuse and Scalability
 - classes: Usage of classes with Cuda
 - interop: Using a cuda compiled kernel from C++
 - memory: Unified memory vs transfer
+- datatrn: Various early experiments done for sliding window algorithm
+- membank: Experiment to take advantage of memory bank access in warp
+- warp-primitives: Experiments with warp instrinsics
+    a. Warp reduce Sum
+    b. Bitonic Sort in warp
 
 
 
