@@ -1,0 +1,1 @@
+> Note: Alloc has not been done with `_mm_alloc` so there is no assurance of aligned memory
